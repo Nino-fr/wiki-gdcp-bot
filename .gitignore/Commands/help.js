@@ -5,11 +5,11 @@ const { MessageEmbed, Message } = require('discord.js');
 class Help extends Command {
   constructor() {
     super({
-      name: 'help',
+      name: 'aide',
       description: 'Donne la liste des commandes que vous pouvez utiliser',
       category: 'Système',
-      usage: 'help [commande]',
-      aliases: ['h', 'halp', 'aide', 'commands'],
+      usage: 'aide [commande]',
+      aliases: ['h', 'halp', 'help', 'commands'],
     });
   }
   /**
