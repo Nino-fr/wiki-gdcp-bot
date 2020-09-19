@@ -1,6 +1,5 @@
 const Command = require('../Base/Command');
 const { MessageEmbed, Message } = require('discord.js');
-const wiki = require('../Wiki/gdcp');
 
 /**
  * Obtenir des infos sur le Wiki
@@ -20,6 +19,7 @@ class Infos extends Command {
    * @param {Message} message
    */
   async run(message) {
+    const wiki = this.bot.wiki;
     const embed = new MessageEmbed()
       .setColor('BLUE')
       .setTitle('Informations sur le wiki ' + wiki.name)

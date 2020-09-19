@@ -1,6 +1,5 @@
 const Command = require('../Base/Command.js');
 const { Message } = require('discord.js');
-const wiki = require('../Wiki/gdcp.js');
 
 /**
  * Rechercher dans les articles du wiki
@@ -24,6 +23,7 @@ class Search extends Command {
    */
   async run(message, args) {
     try {
+      const wiki = this.bot.wiki;
       if (!args[0] || args.join(' ') === '')
         return message.repondre("Veuillez préciser ce qu'il faut rechercher");
       if (/\+\s*[^\s]+/.test(args.join(' '))) {
