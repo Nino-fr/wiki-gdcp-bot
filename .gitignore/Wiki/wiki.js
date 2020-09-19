@@ -657,7 +657,6 @@ class Wiki {
       .then((res) => {
         const results = res.data;
         retour = parseInt(results.query.statistics.pages);
-        console.log(retour);
       });
     return retour;
   }
@@ -677,7 +676,6 @@ class Wiki {
         users =
           results.query.statistics.users +
           ` (${results.query.statistics.activeusers} actifs)`;
-        console.log(retour);
       });
     return users;
   }
@@ -696,7 +694,6 @@ class Wiki {
       .then((res) => {
         const results = res.data;
         retour = parseInt(results.query.statistics.articles);
-        console.log(retour);
       });
     return retour;
   }
