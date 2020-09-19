@@ -28,7 +28,7 @@ class LastBlog extends Command {
 
     wiki.checkBlogsPosted().then(async (blog) => {
       if (blog !== undefined && blog !== null) {
-        return msg.edit('', post);
+        return msg.edit('', blog);
       } else {
         return msg.edit('Aucun billet de blog récent trouvé');
       }
