@@ -5,7 +5,6 @@ const bot = require('./setup.js'),
   regWiki = /https:\/\/gardiens-des-cites-perdues.fandom.com\/fr\/wiki\/[^\s]+/,
   axios = require('axios'),
   prefix = bot.config.settings.prefix,
-  OwnerID = bot.config.ownerID,
   moment = require('moment'),
   { getValues } = require('./fonctions'),
   loguer = bot.logger.log,
@@ -762,7 +761,7 @@ module.exports = class {
 
     // Changer le statut du bot. Envoyer `${prefix}status idle|dnd|online|invisible`
     if (message.content.startsWith(`${prefix}status`)) {
-      if (!message.author.id === OwnerID) return;
+      if (!bot.config.admins.includes(message.author.id)) return;
       message.delete();
       await bot.user.setStatus(args[0].toLowerCase());
     }
