@@ -32,8 +32,12 @@ class Infos extends Command {
         '[Personnages](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Personnages)\n[Familles](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Famille)\n[Pouvoirs](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Pouvoirs?action=edit&redlink=1)\n[Lieux](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Lieux)\n[Conseillers](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Conseiller)\n[Compagnons](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Compagnon)\n[Théories](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Th%C3%A9ories)\n[Aide](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Aide)'
       )
       .addField('Pages populaires', wiki.popularPages)
-      .addField('Modifications totales actuelles', wiki.totalChanges);
-    return message.repondre(embed);
+      .addField('Modifications totales actuelles', wiki.totalChanges, true)
+      .addField(
+        'Fondateur',
+        '[Lou0420](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Utilisateur:Lou0420)'
+      );
+    return message.channel.send(embed);
   }
 }
 
