@@ -153,7 +153,7 @@ const bot = new WikiBot();
 // Initialisons les commandes et événements.
 
 const init = async () => {
-  klaw('./commands').on('data', (item) => {
+  klaw('./Commands').on('data', (item) => {
     const cmdFile = path.parse(item.path);
     if (!cmdFile.ext || cmdFile.ext !== '.js') return;
     const response = bot.loadCommand(
