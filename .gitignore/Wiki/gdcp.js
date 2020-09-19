@@ -1,7 +1,7 @@
 const Wiki = require('./wiki');
 
 const wiki = new Wiki(
-  'Gardiens des Cités perdues',
+  'Gardiens des Cités Perdues',
   'gardiens-des-cites-perdues'
 );
 
