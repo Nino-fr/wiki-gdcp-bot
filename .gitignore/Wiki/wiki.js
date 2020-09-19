@@ -655,7 +655,7 @@ class Wiki {
       )
       .then((res) => {
         const results = res.data;
-        return parseInt(results.statistics.pages);
+        return parseInt(results.query.statistics.pages);
       });
   }
 
@@ -671,8 +671,8 @@ class Wiki {
       .then((res) => {
         const results = res.data;
         return (
-          results.statistics.users +
-          ` (${results.statistics.activeusers} actifs)`
+          results.query.statistics.users +
+          ` (${results.query.statistics.activeusers} actifs)`
         );
       });
   }
@@ -688,7 +688,7 @@ class Wiki {
       )
       .then((res) => {
         const results = res.data;
-        return parseInt(results.statistics.articles);
+        return parseInt(results.query.statistics.articles);
       });
   }
 
