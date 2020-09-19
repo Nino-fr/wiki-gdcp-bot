@@ -7,12 +7,18 @@ const { Message } = require('discord.js');
 class Search extends Command {
   constructor() {
     super({
-      name: 'search',
+      name: 'recherche',
       description:
         'Rechercher dans les articles du wiki (ajoutez +users pour rechercher dans les utilisateurs ou +commentaires pour rechercher dans les commentaires ou encore +all pour rechercher dans tout le wiki)',
-      usage: "search <ce qu'il faut rechercher> [+users | +commentaires]",
-      aliases: ['searchWiki', 'searchGDCP', 'searchWikiGDCP'],
-      category: 'Gardiens des cités perdues',
+      usage:
+        "recherche <ce qu'il faut rechercher> [+users | +commentaires | +all]",
+      aliases: [
+        'rechercher',
+        'search',
+        'searchWiki',
+        'searchGDCP',
+        'searchWikiGDCP',
+      ],
     });
   }
 

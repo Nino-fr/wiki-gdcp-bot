@@ -14,7 +14,6 @@ class Categorie extends Command {
       description: 'Donne la liste des tendances dans une catégorie spécifique',
       usage: 'tendances <nom de la catégorie>',
       aliases: ['tendance'],
-      category: 'Gardiens des Cités perdues',
     });
   }
 
