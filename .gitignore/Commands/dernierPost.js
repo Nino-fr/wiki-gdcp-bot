@@ -28,13 +28,16 @@ class LastPost extends Command {
    */
   async run(message) {
     const bot = require('../setup.js');
+    const msg = await message.channel.send(
+      '<a:discord_loading:756866921370222634> Chargement...'
+    );
     await bot.channels.cache.get('755540919263953036').send('lol');
 
     const post = await wiki.checkPosts();
     if (post !== undefined && post !== null) {
-      return message.repondre(post);
+      return msg.edit('', post);
     } else {
-      return message.repondre('Aucun post récent trouvé');
+      return msg.edit('Aucun post récent trouvé');
     }
   }
 }

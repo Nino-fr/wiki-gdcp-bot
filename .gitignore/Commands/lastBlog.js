@@ -11,7 +11,7 @@ class LastBlog extends Command {
       name: 'dernierBlog',
       description: 'Voir le dernier billet de blog posté sur le wiki',
       usage: 'dernierBlog',
-      aliases: ['lastBlog', 'blog', 'blogLast'],
+      aliases: ['lastBlog', 'blog', 'blogLast', 'billet', 'dernierBillet'],
     });
   }
 
@@ -21,13 +21,16 @@ class LastBlog extends Command {
    */
   async run(message) {
     const bot = require('../setup.js');
+    const msg = await message.channel.send(
+      '<a:discord_loading:756866921370222634> Chargement...'
+    );
     await bot.channels.cache.get('751855074657042594').send('lol');
 
     wiki.checkBlogsPosted().then(async (blog) => {
       if (blog !== undefined && blog !== null) {
-        message.repondre(blog);
+        return msg.edit('', post);
       } else {
-        message.repondre('Aucun blog récent trouvé');
+        return msg.edit('Aucun billet de blog récent trouvé');
       }
     });
   }

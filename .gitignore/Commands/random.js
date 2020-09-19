@@ -21,12 +21,15 @@ class Random extends Command {
    * @param {string[]} args
    */
   async run(message) {
+    const msg = await message.channel.send(
+      '<a:discord_loading:756866921370222634> Chargement...'
+    );
     const repl = await wiki.random();
     if (repl === undefined || repl === null)
       return message.repondre(
         'Une erreur est survenue, veuillez réessayer. Si cela ne fonctionne toujours pas, veuillez contacter mon créateur.'
       );
-    return message.repondre(repl);
+    return msg.edit('', repl);
   }
 }
 
