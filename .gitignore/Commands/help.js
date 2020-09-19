@@ -33,12 +33,11 @@ class Help extends Command {
       .setAuthor(
         `Page d'aide`,
         this.bot.user.displayAvatarURL({ format: 'png' })
-      )
-      .setThumbnail(
+      );
+    if (!args[0]) {
+      embed.setThumbnail(
         'https://static.wikia.nocookie.net/gardiens-des-cites-perdue/images/e/e2/Bienvenue.png/revision/latest/scale-to-width-down/560?cb=20180317150931&path-prefix=fr'
       );
-
-    if (!args[0]) {
       const categories = ['Wiki', 'Système'];
       embed.setDescription(
         `**Utilisez ${this.bot.config.settings.prefix}help <commande> pour plus de détails**\n`
