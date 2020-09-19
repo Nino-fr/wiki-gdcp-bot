@@ -4,7 +4,8 @@
   "description": "Un bot pour le serveur Discord du Wiki Gardiens des Cités Perdues",
   "main": "setup.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node setup.js"
   },
   "repository": {
     "type": "git",
