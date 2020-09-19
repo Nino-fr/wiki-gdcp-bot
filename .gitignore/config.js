@@ -15,7 +15,7 @@ const config = {
   mod: ['718456289704804392'],
 
   // Le token de votre bot, trouvable sur https://discordapp.com/developers/applications/me
-  token: 'NzQ5OTg3MTEzNTExOTQ0Mzc0.X0z97Q.jjP_XxBehH4JLulyIsWfia_lAv8',
+  token: process.env.TOKEN,
 
   settings: {
     prefix: ';',
