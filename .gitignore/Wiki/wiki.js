@@ -645,6 +645,54 @@ class Wiki {
   }
 
   /**
+   * @returns {Promise<number>}
+   * @private
+   */
+  async _getTotalPages() {
+    await axios.default
+      .get(
+        'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
+      )
+      .then((res) => {
+        const results = res.data;
+        return parseInt(results.statistics.pages);
+      });
+  }
+
+  /**
+   * @returns {Promise<string>}
+   * @private
+   */
+  async _getUsers() {
+    await axios.default
+      .get(
+        'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
+      )
+      .then((res) => {
+        const results = res.data;
+        return (
+          results.statistics.users +
+          ` (${results.statistics.activeusers} actifs)`
+        );
+      });
+  }
+
+  /**
+   * @returns {Promise<number>}
+   * @private
+   */
+  async _getArticlesCount() {
+    await axios.default
+      .get(
+        'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
+      )
+      .then((res) => {
+        const results = res.data;
+        return parseInt(results.statistics.articles);
+      });
+  }
+
+  /**
    * Créer un embed quand un billet de blog est posté sur le wiki
    * @public
    * @example
@@ -819,6 +867,9 @@ class Wiki {
     this._getCategories().then((res) => (this.categories = res));
     this._getTotalChanges().then((res) => (this.totalChanges = res));
     this._getPopularPages().then((res) => (this.popularPages = res));
+    this._getTotalPages().then((pages) => (this.totalPages = pages));
+    this._getUsers().then((users) => (this.users = users));
+    this._getArticlesCount().then((articles) => (this.articles = articles));
   }
 }
 
