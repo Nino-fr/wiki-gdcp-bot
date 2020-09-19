@@ -3,13 +3,14 @@ const Command = require('../Base/Command.js'),
   wiki = require('../Wiki/gdcp.js');
 
 /**
- * Voir le dernier billet de post posté sur le wiki
+ * Voir la dernière publication postée dans la partie communauté du wiki
  */
 class LastPost extends Command {
   constructor() {
     super({
       name: 'dernierPost',
-      description: 'Voir la dernière publication postée sur le wiki',
+      description:
+        'Voir la dernière publication postée dans la partie communauté du wiki',
       usage: 'dernierPost',
       aliases: [
         'lastPost',
