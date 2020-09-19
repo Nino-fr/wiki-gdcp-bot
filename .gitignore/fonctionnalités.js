@@ -27,6 +27,7 @@ module.exports = class {
         url = encodeURI(url);
         const cheerio = require('cheerio');
         await axios.default.get(url).then(async (res) => {
+          try {
             const $ = cheerio.load(res.data);
             let title = $('meta[property="og:title"]')[0].attribs.content;
             let description = $('meta[name="description"]')[0].attribs.content;
