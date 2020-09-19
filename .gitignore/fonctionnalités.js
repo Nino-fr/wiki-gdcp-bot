@@ -1,9 +1,7 @@
 const { ownerID } = require('./config.js');
 
 const bot = require('./setup.js'),
-  Wiki = require('./Wiki/wiki.js'),
-  wiki = require('./Wiki/gdcp.js'),
-  { Message, MessageEmbed, TextChannel, Webhook } = require('discord.js'),
+  { Message, MessageEmbed } = require('discord.js'),
   regWiki = /https:\/\/gardiens-des-cites-perdues.fandom.com\/fr\/wiki\/[^\s]+/,
   axios = require('axios'),
   prefix = bot.config.settings.prefix,
@@ -29,7 +27,6 @@ module.exports = class {
         url = encodeURI(url);
         const cheerio = require('cheerio');
         await axios.default.get(url).then(async (res) => {
-          try {
             const $ = cheerio.load(res.data);
             let title = $('meta[property="og:title"]')[0].attribs.content;
             let description = $('meta[name="description"]')[0].attribs.content;
@@ -51,7 +48,7 @@ module.exports = class {
                 $('title').text(),
                 bot.user.avatarURL({ format: 'png' })
               );
-            return message.channel.send(embed);
+            await message.channel.send(embed);
           } catch {
             return undefined;
           }
@@ -344,46 +341,6 @@ module.exports = class {
           },
           color: 0x1f75fe,
         },
-      });
-    }
-
-    /**
-     *
-     * @param { TextChannel } channel Le salon où créer le webhook
-     * @param { string } title Le nom du Webhook
-     * @param { string } msg Le message à envoyer
-     * @param { string } avatar Le lien de l'avatar
-     * @returns { Webhook }
-     */
-    function hook(
-      channel = message.channel,
-      title = 'Captain hook',
-      msg = 'Hello World',
-      avatar = 'https://cdn.discordapp.com/attachments/659433619881984021/734393942463741993/unnamed.jpg'
-    ) {
-      avatar = avatar.replace(/\s/g, '');
-
-      channel.fetchWebhooks().then((webhooks) => {
-        let foundHook = webhooks.find((web) => web.name === title);
-
-        if (!foundHook) {
-          channel
-            .createWebhook(
-              title,
-              'https://cdn.discordapp.com/attachments/659433619881984021/734393942463741993/unnamed.jpg'
-            )
-            .then((webhook) => {
-              webhook.send(msg, {
-                username: title,
-                avatarURL: avatar,
-              });
-            });
-        } else {
-          foundHook.send(msg, {
-            username: title,
-            avatarURL: avatar,
-          });
-        }
       });
     }
 
