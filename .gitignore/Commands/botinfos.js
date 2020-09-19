@@ -1,5 +1,6 @@
-const Command = require('../Base/Command.js');
-const { version, Message, MessageEmbed } = require('discord.js');
+const Command = require('../Base/Command.js'),
+  { version, Message, MessageEmbed } = require('discord.js'),
+  { convertMS } = require('../fonctions');
 
 class Stats extends Command {
   constructor() {
@@ -15,7 +16,8 @@ class Stats extends Command {
    * @param {Message} message Le message
    */
   async run(message) {
-    const duration = new Date(this.bot.uptime).toLocaleString('fr');
+    const objDur = convertMS(this.bot.uptime);
+    const duration = `${objDur.d} jours, ${objDur.h} heures, ${objDur.m} minutes et ${objDur.s} secondes`;
     const embed = new MessageEmbed()
       .setTitle('Informations à mon propos')
       .setColor('DARK_GOLD')
