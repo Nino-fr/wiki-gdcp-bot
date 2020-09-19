@@ -776,17 +776,12 @@ class Wiki {
         await bot.channels.cache
           .get('755540919263953036')
           .messages.fetch({ limit: 1 })
-      ).first().content !== blogEmbed.description
+      ).first().content !== blogEmbed.url
     ) {
-      if (
-        blogEmbed.description === undefined ||
-        blogEmbed.description === null
-      ) {
+      if (blogEmbed.url === undefined || blogEmbed.url === null) {
         return undefined;
       } else {
-        await bot.channels.cache
-          .get('755540919263953036')
-          .send(blogEmbed.description);
+        await bot.channels.cache.get('755540919263953036').send(blogEmbed.url);
         return blogEmbed;
       }
     }
