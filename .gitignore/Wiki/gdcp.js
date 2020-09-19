@@ -10,14 +10,12 @@ setInterval(async function () {
   const blogEmbed = await wiki.checkBlogsPosted();
   if (blogEmbed !== undefined && blogEmbed !== null) {
     bot.guilds.cache.forEach(async (g) => {
-      await g.channels.cache
-        .find((ch) => ch.name.includes('général'))
-        .send(blogEmbed);
+      await g.channels.cache.get('757017514025812082').send(blogEmbed);
     });
   }
   const postEmbed = await wiki.checkPosts();
   if (postEmbed !== undefined && postEmbed !== null) {
-    await bot.channels.cache.find((ch) => ch.name === 'posts').send(postEmbed);
+    await bot.channels.cache.get('757017442093629600').send(postEmbed);
   }
 }, 60000);
 
