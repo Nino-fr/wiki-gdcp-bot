@@ -649,14 +649,16 @@ class Wiki {
    * @private
    */
   async _getTotalPages() {
+    let retour;
     await axios.default
       .get(
         'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
       )
       .then((res) => {
         const results = JSON.parse(res.data);
-        return parseInt(results.query.statistics.pages);
+        retour = parseInt(results.query.statistics.pages);
       });
+    return retour;
   }
 
   /**
@@ -664,17 +666,18 @@ class Wiki {
    * @private
    */
   async _getUsers() {
+    let users;
     await axios.default
       .get(
         'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
       )
       .then((res) => {
         const results = JSON.parse(res.data);
-        return (
+        users =
           results.query.statistics.users +
-          ` (${results.query.statistics.activeusers} actifs)`
-        );
+          ` (${results.query.statistics.activeusers} actifs)`;
       });
+    return users;
   }
 
   /**
@@ -682,14 +685,17 @@ class Wiki {
    * @private
    */
   async _getArticlesCount() {
+    let retour;
+
     await axios.default
       .get(
         'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
       )
       .then((res) => {
         const results = JSON.parse(res.data);
-        return parseInt(results.query.statistics.articles);
+        retour = parseInt(results.query.statistics.articles);
       });
+    return retour;
   }
 
   /**
