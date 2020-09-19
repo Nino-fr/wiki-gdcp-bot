@@ -19,7 +19,7 @@ module.exports = class {
 
     // Initialisons le statut du bot
     await bot.user.setActivity(
-      `${bot.settings.get('settings').prefix}help | ${
+      `${bot.settings.get('settings').prefix}help • ${
         bot.users.cache.size
       } utilisateurs`
     );
