@@ -1,4 +1,4 @@
-const Command = require('../base/Command.js'),
+const Command = require('../Base/Command.js'),
   { Message } = require('discord.js'),
   wiki = require('../Wiki/gdcp.js');
 

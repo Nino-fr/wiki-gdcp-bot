@@ -1,4 +1,4 @@
-const Command = require('../base/Command.js');
+const Command = require('../Base/Command.js');
 const { blue_dark } = require('../colours.json');
 const { MessageEmbed, Message } = require('discord.js');
 

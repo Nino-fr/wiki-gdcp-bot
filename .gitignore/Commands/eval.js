@@ -1,5 +1,5 @@
 const { Message } = require('discord.js'),
-  Command = require('../base/Command.js');
+  Command = require('../Base/Command.js');
 
 /**
  * Evalue un code JavaScript

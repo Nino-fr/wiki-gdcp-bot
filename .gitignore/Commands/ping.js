@@ -1,4 +1,4 @@
-const Command = require('../base/Command.js');
+const Command = require('../Base/Command.js');
 const { Message } = require('discord.js');
 
 class Ping extends Command {
