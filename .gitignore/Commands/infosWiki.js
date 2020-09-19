@@ -37,7 +37,9 @@ class Infos extends Command {
         'Fondateur',
         '[Lou0420](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Utilisateur:Lou0420)',
         true
-      );
+      )
+      .addField('Pages au total', wiki.totalPages, true)
+      .addField("Nombre d'utilisateurs", wiki.users, true);
     return message.channel.send(embed);
   }
 }
