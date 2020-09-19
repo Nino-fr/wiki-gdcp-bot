@@ -126,7 +126,7 @@ class Wiki {
         .replace(/d+i+s+c+u+[st]+i+o+n+s*/, 'commentaires')
         .replace(/b+l+o+g+[sue]*/, 'blog')
         .replace(/a+l+/, 'all')
-        .replace(/t+o+u+[ts]+e*/, 'all');
+        .replace(/t+o+u+[ts]*e*/, 'all');
 
       let boolResult = true;
       if (filter === 'users') {
@@ -207,7 +207,7 @@ class Wiki {
                 } résultats trouvés`
               );
               embed.title = `Résultats de la recherche pour \`${toSearch.trim()}\` dans tout le wiki`;
-              for (let i = 0; i < titles.length; i++) {
+              for (let i = 0; i <= 20; i++) {
                 embed.addField(
                   titles[i].replace(/:/g, ' : '),
                   `[Lien](${links[i]})`
