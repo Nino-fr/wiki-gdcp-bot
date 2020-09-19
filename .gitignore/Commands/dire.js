@@ -1,5 +1,5 @@
 const { Message } = require('discord.js');
-const Command = require('../base/Command.js');
+const Command = require('../Base/Command.js');
 
 class Say extends Command {
   constructor() {

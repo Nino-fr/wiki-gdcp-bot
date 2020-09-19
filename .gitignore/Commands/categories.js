@@ -20,7 +20,7 @@ class Categories extends Command {
    * @param {Message} message
    */
   async run(message) {
-    await message.repondre(wiki.categories);
+    return message.repondre(wiki.categories);
   }
 }
 
