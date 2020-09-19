@@ -33,7 +33,7 @@ class Stats extends Command {
       )
       .addField(
         'Utilisation de la RAM',
-        (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2),
+        (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2) + ' MB',
         true
       )
       .addField('Temps en ligne', duration, true)
