@@ -655,7 +655,7 @@ class Wiki {
         'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
       )
       .then((res) => {
-        const results = JSON.parse(res.data);
+        const results = res.data;
         retour = parseInt(results.query.statistics.pages);
         console.log(retour);
       });
@@ -673,7 +673,7 @@ class Wiki {
         'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
       )
       .then((res) => {
-        const results = JSON.parse(res.data);
+        const results = res.data;
         users =
           results.query.statistics.users +
           ` (${results.query.statistics.activeusers} actifs)`;
@@ -694,7 +694,7 @@ class Wiki {
         'https://gardiens-des-cites-perdues.fandom.com/fr/api.php?action=query&meta=allmessages|siteinfo&ammessages=custom-Wiki_Manager|custom-FandomMergeNotice&amenableparser=true&siprop=general|statistics|wikidesc&titles=Special:Statistics&format=json'
       )
       .then((res) => {
-        const results = JSON.parse(res.data);
+        const results = res.data;
         retour = parseInt(results.query.statistics.articles);
         console.log(retour);
       });
