@@ -732,32 +732,34 @@ class Wiki {
       timestamp = infosSelected[4],
       title = infosSelected[9],
       catURL = `https://${this.nameURL}.fandom.com` + infosSelected[6];
-    let img = undefined;
+    let img;
     try {
       img = cheerio
         .load(infosSelected[0])('img[class="post__image"]')
         .toArray()[0].attribs.src;
     } catch {}
     let content;
-
-    infosSelected[10]
-      .replace(
-        /<a href="([^"]+)">((?:.(?!\/a>))+)/g,
-        `[$2](${`https://${this.nameURL}.fandom.com$1`})`
-      )
-      .replace(/<\/lu>/g, '')
-      .replace(/<li>((?:.(?!\/li>))+)<\/li>\s*/gis, ' - $1\n')
-      .split(/<\/p>/g)
-      .forEach((par) => {
-        let toUse = par + '</p>';
-        let $ = cheerio.load(toUse);
-        content = content + $('p').text() + '\n';
-      });
+    try {
+      infosSelected[10]
+        .replace(
+          /<a href="([^"]+)">((?:.(?!\/a>))+)/g,
+          `[$2](${`https://${this.nameURL}.fandom.com$1`})`
+        )
+        .replace(/<\/lu>/g, '')
+        .replace(/<li>((?:.(?!\/li>))+)<\/li>\s*/gis, ' - $1\n')
+        .split(/<\/p>/g)
+        .forEach((par) => {
+          let toUse = par + '</p>';
+          let $ = cheerio.load(toUse);
+          content = content + $('p').text() + '\n';
+        });
+    } catch {}
+    if (infosSelected[10].includes('post-poll')) content = '';
     content = content.replace(/(?:undefined|null)/g, '');
 
     const cat = infosSelected[7],
-      upVotes = infosSelected[11],
-      comments = infosSelected[12],
+      upVotes = infosSelected[12],
+      comments = infosSelected[13],
       link = `https://${this.nameURL}.fandom.com` + infosSelected[8];
 
     blogEmbed
