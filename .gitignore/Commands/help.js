@@ -69,7 +69,7 @@ class Help extends Command {
             `\`${this.bot.config.settings.prefix + command.help.usage}\``
           )
           .addField(
-            'Raccourcis de la commande',
+            'Autres noms de la commande de la commande',
             command.conf.aliases.join(', '),
             true
           )
@@ -95,7 +95,7 @@ class Help extends Command {
             `\`${this.bot.config.settings.prefix + command.help.usage}\``
           )
           .addField(
-            'Raccourcis de la commande',
+            'Autres noms de la commande de la commande',
             command.conf.aliases.join(', '),
             true
           )
