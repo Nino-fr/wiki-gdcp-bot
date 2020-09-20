@@ -590,7 +590,7 @@ class Wiki {
     for (let i = 0; i <= 20; i++) {
       embed.addField(names[i], `[**Voir la catégorie**](${links[i]})`);
     }
-    return embed;
+    return { embed: embed, total: total };
   }
 
   /**
