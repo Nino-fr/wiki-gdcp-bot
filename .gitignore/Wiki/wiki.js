@@ -722,7 +722,7 @@ class Wiki {
     /**
      * @type {RegExpMatchArray}
      */
-    const infosSelected = infos[0].match(getInformationsPost);
+    const infosSelected = infos[1].match(getInformationsPost);
     const userURL = `https://${this.nameURL}.fandom.com` + infosSelected[1],
       thumbnail = infosSelected[2],
       // timestampURL = `https://${this.nameURL}.fandom.com` + infosSelected[3],
@@ -754,13 +754,14 @@ class Wiki {
           content = content + $('p').text() + '\n';
         });
     } catch {}
-    if (infosSelected[10].includes('post-poll')) content = '';
-    content = content.replace(/(?:undefined|null)/g, '');
 
     const cat = infosSelected[7],
       upVotes = infosSelected[12],
       comments = infosSelected[13],
       link = `https://${this.nameURL}.fandom.com` + infosSelected[8];
+    if (infosSelected[10].includes('post-poll'))
+      content = `[[Sondage](${link})]`;
+    content = content.replace(/(?:undefined|null)/g, '');
 
     blogEmbed
       .setAuthor(user_name, thumbnail, userURL)
