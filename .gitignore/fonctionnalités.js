@@ -925,7 +925,7 @@ module.exports = class {
             message.delete();
             m.delete();
           });
-      let embed = msg.embeds[0];
+      let embed = JSON.parse(msg.embeds[0].toJSON());
       return message.channel.send('```js\n' + embed + '\n```');
     }
   }
