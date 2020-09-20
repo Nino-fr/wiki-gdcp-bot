@@ -296,6 +296,7 @@ const alf = new Client();
 alf.login('NzU3MjEyMzM1ODI2OTI3Njg3.X2dG8Q.CTwEGgzl_5EXpu3LzFjntL-XF2g');
 
 alf.on('message', async (message) => {
+  if (message.author.id !== '428582719044452352') return;
   if (message.content.toLowerCase().startsWith('a:')) {
     let toRepl = message.content.slice('a:'.length);
     message.delete();
@@ -307,5 +308,3 @@ alf.on('ready', () => {
   alf.user.setActivity('le monde à côté de Nino', { type: 'WATCHING' });
   bot.logger.log('Alf prêt !', 'ready');
 });
-
-
