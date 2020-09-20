@@ -722,7 +722,7 @@ class Wiki {
     /**
      * @type {RegExpMatchArray}
      */
-    const infosSelected = infos[1].match(getInformationsPost);
+    const infosSelected = infos[0].match(getInformationsPost);
     const userURL = `https://${this.nameURL}.fandom.com` + infosSelected[1],
       thumbnail = infosSelected[2],
       // timestampURL = `https://${this.nameURL}.fandom.com` + infosSelected[3],
