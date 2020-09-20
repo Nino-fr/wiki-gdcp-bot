@@ -304,6 +304,8 @@ alf.on('message', async (message) => {
 });
 
 alf.on('ready', () => {
+  alf.user.setActivity('le monde à côté de Nino', { type: 'WATCHING' });
   bot.logger.log('Alf prêt !', 'ready');
 });
+
 
