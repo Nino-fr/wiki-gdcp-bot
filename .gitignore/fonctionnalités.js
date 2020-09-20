@@ -916,5 +916,17 @@ module.exports = class {
         }
       });
     }
+    if (message.content.toLowerCase().startsWith(prefix + 'viewcode')) {
+      const msg = await message.channel.messages.fetch(args[0]);
+      if (!msg.embeds || !msg.embeds[0])
+        return message.channel
+          .send('Ce message ne contient aucun embed !')
+          .then((m) => {
+            message.delete();
+            m.delete();
+          });
+      let embed = msg.embeds[0];
+      return message.channel.send('```js\n' + embed + '\n```');
+    }
   }
 };
