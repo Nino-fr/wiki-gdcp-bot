@@ -9,13 +9,11 @@ const config = {
     '443800928902971402',
     '684112671695699989',
     '745935191582703626',
-    '690524819103547462',
-    '557612750734491661',
   ],
   mod: ['718456289704804392'],
 
   // Le token de votre bot, trouvable sur https://discordapp.com/developers/applications/me
-  token: process.env.TOKEN,
+  token: 'NzQ5OTg3MTEzNTExOTQ0Mzc0.X0z97Q.jjP_XxBehH4JLulyIsWfia_lAv8',
 
   settings: {
     prefix: ';',
