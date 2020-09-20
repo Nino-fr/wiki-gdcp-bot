@@ -207,7 +207,7 @@ class Wiki {
                 } résultats trouvés`
               );
               embed.title = `Résultats de la recherche pour \`${toSearch.trim()}\` dans tout le wiki`;
-              for (let i = 0; i <= 20; i++) {
+              for (let i = 0; i <= 15; i++) {
                 embed.addField(
                   titles[i].replace(/:/g, ' : '),
                   `[Lien](${links[i]})`
@@ -587,7 +587,7 @@ class Wiki {
       );
 
     // embed.addField('\u200b', '\u200b');
-    for (let i = 0; i <= 20; i++) {
+    for (let i = 0; i <= 10; i++) {
       embed.addField(names[i], `[**Voir la catégorie**](${links[i]})`);
     }
     return { embed: embed, total: parseInt(total.match(/\d+/)[0]) };
