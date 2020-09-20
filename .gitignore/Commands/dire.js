@@ -19,24 +19,26 @@ class Say extends Command {
    * @param {string[]} args
    */
   async run(message, args) {
+    if (!args[0])
+      return message.channel.send('Veuillez préciser un message à répéter.');
     let argsresult;
     let mChannel = message.mentions.channels.first();
 
     message.delete();
     if (mChannel) {
       argsresult = args.slice(1).join(' ');
-      if (!argsresult)
+      if (!argsresult || argsresult.trim() === '')
         return message.repondre(
           message,
-          'Veuillez préciser un message à répéter'
+          'Veuillez préciser un message à répéter.'
         );
       mChannel.send(argsresult, { disableMentions: 'everyone' });
     } else {
       argsresult = args.join(' ');
-      if (!argsresult)
+      if (!argsresult || argsresult.trim() === '')
         return message.repondre(
           message,
-          'Veuillez préciser un message à répéter'
+          'Veuillez préciser un message à répéter.'
         );
       message.channel.send(argsresult, { disableMentions: 'everyone' });
     }
