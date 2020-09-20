@@ -290,3 +290,20 @@ for (let i = 0; i < dependencies.length; i++) {
 console.log(result);
 
 module.exports = bot;
+
+const alf = new Client();
+
+alf.login('NzU3MjEyMzM1ODI2OTI3Njg3.X2dG8Q.CTwEGgzl_5EXpu3LzFjntL-XF2g');
+
+alf.on('message', async (message) => {
+  if (message.content.toLowerCase().startsWith('a:')) {
+    let toRepl = message.content.slice('a:'.length);
+    message.delete();
+    return message.channel.send(toRepl);
+  }
+});
+
+alf.on('ready', () => {
+  bot.logger.log('Alf prêt !', 'ready');
+});
+
