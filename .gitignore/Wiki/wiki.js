@@ -91,14 +91,12 @@ class Wiki {
         await bot.channels.cache
           .get('751855074657042594')
           .messages.fetch({ limit: 1 })
-      ).first().content !== blogEmbed.title
+      ).first().content !== blogEmbed.url
     ) {
-      if (blogEmbed.title === undefined || blogEmbed.title === null) {
+      if (blogEmbed.url === undefined || blogEmbed.url === null) {
         return undefined;
       } else {
-        await bot.channels.cache
-          .get('751855074657042594')
-          .send(blogEmbed.title);
+        await bot.channels.cache.get('751855074657042594').send(blogEmbed.url);
         return blogEmbed;
       }
     } else return undefined;
@@ -718,11 +716,55 @@ class Wiki {
     if (!infos || infos.length === 0) {
       return undefined;
     }
+    /**
+     *
+     * @param  {...string} dates
+     */
+    function getLatestDate(...dates) {
+      /**
+       * @type {number[]}
+       */
+      let nums = [];
+      dates.forEach((date) => {
+        let toPush = new Date(date).getTime();
+        nums.push(toPush);
+      });
+      return nums.sort((a, b) => b - a)[0];
+    }
+
+    let mostRecent = infos[0];
+    let dates = [],
+      latestDate;
+    infos.forEach((info) => {
+      if (
+        /<time\s*datetime="[^"]+"\s*title="[^"]+"\s*>\s*[^<]+<\/time\s*>/is.test(
+          info
+        )
+      ) {
+        let matched = info.match(
+          /<time\s*datetime="([^"]+)"\s*title="[^"]+"\s*>\s*[^<]+<\/time\s*>/is
+        )[1];
+        dates.push(matched);
+      }
+    });
+    latestDate = getLatestDate(...dates);
+    infos.forEach((info) => {
+      if (
+        /<time\s*datetime="[^"]+"\s*title="[^"]+"\s*>\s*[^<]+<\/time\s*>/is.test(
+          info
+        )
+      ) {
+        let matched = info.match(
+          /<time\s*datetime="([^"]+)"\s*title="[^"]+"\s*>\s*[^<]+<\/time\s*>/is
+        )[1];
+        if (latestDate === new Date(matched).getTime()) mostRecent = info;
+      }
+    });
 
     /**
      * @type {RegExpMatchArray}
      */
-    const infosSelected = infos[0].match(getInformationsPost);
+    const infosSelected = mostRecent.match(getInformationsPost);
     const userURL = `https://${this.nameURL}.fandom.com` + infosSelected[1],
       thumbnail = infosSelected[2],
       // timestampURL = `https://${this.nameURL}.fandom.com` + infosSelected[3],
