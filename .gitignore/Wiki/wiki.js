@@ -819,7 +819,7 @@ class Wiki {
           ' •' +
           (parseInt(comments) !== 0
             ? ` ${comments} commentaires`
-            : 'Aucun commentaire')
+            : ' Aucun commentaire')
       );
 
     if (
