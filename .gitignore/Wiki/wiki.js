@@ -813,7 +813,13 @@ class Wiki {
       .setImage(img)
       .setColor('RANDOM')
       .setFooter(
-        timestamp.correctDate() + ` • ${upVotes} ❤️ et ${comments} commentaires`
+        timestamp.correctDate() +
+          ' •' +
+          (parseInt(upVotes) !== 0 ? ` ${upVotes} ❤️` : 'Aucun vote') +
+          ' •' +
+          (parseInt(comments) !== 0
+            ? ` ${comments} commentaires`
+            : 'Aucun commentaire')
       );
 
     if (
