@@ -28,7 +28,7 @@ class LastPost extends Command {
    * @param {Message} message
    */
   async run(message) {
-    const bot = require('../setup.js');
+    const bot = this.bot;
     const msg = await message.channel.send(
       '<a:discord_loading:756866921370222634> Chargement...'
     );
@@ -36,6 +36,7 @@ class LastPost extends Command {
 
     const post = await wiki.checkPosts();
     if (post !== undefined && post !== null) {
+      delete post.footer;
       return msg.edit('', post);
     } else {
       return msg.edit('Aucun post récent trouvé');
