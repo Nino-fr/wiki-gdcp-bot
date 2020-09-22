@@ -20,7 +20,7 @@ class LastBlog extends Command {
    * @param {Message} message
    */
   async run(message) {
-    const bot = require('../setup.js');
+    const bot = this.bot;
     const msg = await message.channel.send(
       '<a:discord_loading:756866921370222634> Chargement...'
     );
@@ -28,6 +28,7 @@ class LastBlog extends Command {
 
     wiki.checkBlogsPosted().then(async (blog) => {
       if (blog !== undefined && blog !== null) {
+        delete blog.footer;
         return msg.edit('', blog);
       } else {
         return msg.edit('Aucun billet de blog récent trouvé');
