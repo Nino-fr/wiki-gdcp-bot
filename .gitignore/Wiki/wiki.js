@@ -48,11 +48,7 @@ class Wiki {
           (await matched.match(
             /(?<=class="blog-listing__user-name"\/*>)[^<]+/
           ));
-        const timestamp =
-          (await matched.match(regInfos)[3]) ||
-          (await matched.match(
-            /(?<=<span class="blog-listing__timestamp"\/*>)[^<]+/
-          ));
+        const timestamp = new Date().toLocaleDateString('fr');
         const link =
           `https://${this.nameURL}.fandom.com` +
           ((await matched.match(regInfos)[4]) ||
@@ -812,10 +808,9 @@ class Wiki {
       .setDescription(` dans [${cat}](${catURL})\n\n${content.correctString()}`)
       .setImage(img)
       .setColor('RANDOM')
+      .setTimestamp()
       .setFooter(
-        timestamp.correctDate() +
-          ' •' +
-          (parseInt(upVotes) !== 0 ? ` ${upVotes} ❤️` : 'Aucun vote') +
+        (parseInt(upVotes) !== 0 ? ` ${upVotes} ❤️` : 'Aucun vote') +
           ' •' +
           (parseInt(comments) !== 0
             ? ` ${comments} commentaires`
