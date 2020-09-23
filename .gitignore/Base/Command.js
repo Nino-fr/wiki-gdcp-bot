@@ -1,5 +1,8 @@
 const bot = require('../setup.js');
 
+/**
+ * La classe qui sert de base à toutes les commandes
+ */
 class Command {
   constructor({
     /**
