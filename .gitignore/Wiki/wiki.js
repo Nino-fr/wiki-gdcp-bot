@@ -179,7 +179,7 @@ class Wiki {
               for (let i = 0; i < titles.length; i++) {
                 if (i > 20) break;
                 embed.addField(
-                  titles[i],
+                  titles[i].replace(/Discussion:/i, ''),
                   `[Lien vers le commentaire](${links[i]})`
                 );
               }
