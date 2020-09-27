@@ -908,6 +908,39 @@ class Wiki {
   }
 
   /**
+   * Check si SM a fait un nouveau post Instagram
+   */
+  async checkInstaPost() {
+    const bot = require('../setup');
+    const instaPosts = require('instagram-posts');
+    let lastSMPost = await instaPosts('sw_messenger');
+    lastSMPost = lastSMPost[0];
+    if (
+      (
+        await bot.channels.cache
+          .get('759676597761998848')
+          .messages.fetch({ limit: 1 })
+      ).content !== lastSMPost.id
+    ) {
+      const lEmbed = new MessageEmbed()
+        .setColor('RANDOM')
+        .setAuthor(
+          lastSMPost.owner.username,
+          'https://pbs.twimg.com/profile_images/2854007123/5697810c2469f90473751c1b4ddd8aa6_400x400.jpeg',
+          'https://www.instagram.com/sw_messenger/'
+        )
+        .setDescription(lastSMPost.text)
+        .setImage(lastSMPost.thumbnail_src)
+        .setFooter(
+          lastSMPost.likes + ' likes • ' + lastSMPost.comments + ' commentaires'
+        )
+        .setTimestamp();
+      bot.channels.cache.get('759676597761998848').send(lastSMPost.id);
+      return lEmbed;
+    } else return undefined;
+  }
+
+  /**
    * @param {string} name Le nom du wiki fandom
    * @param {string} nameURL Le nom du wiki fandom en format URI
    */

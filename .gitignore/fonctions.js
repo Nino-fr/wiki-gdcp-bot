@@ -20,7 +20,7 @@ function convertMS(ms) {
   };
 }
 /**
- * @param { ObjectConstructor } obj L'object
+ * @param { object } obj L'object
  * @param { String } key La clé de la valeur
  * @param {*} val La valeur de la clé
  * @returns
@@ -46,7 +46,7 @@ function getObjects(obj, key, val) {
 }
 /**
  * Returns an array of values that match on a certain key
- * @param { ObjectConstructor } obj L'objet
+ * @param { object } obj L'objet
  * @param {String} key La clé
  */
 function getValues(obj, key) {
@@ -63,7 +63,7 @@ function getValues(obj, key) {
 }
 /**
  * Returns an array of keys that match on a certain value
- * @param { ObjectConstructor } obj
+ * @param { object } obj
  * @param {*} val
  */
 function getKeys(obj, val) {
