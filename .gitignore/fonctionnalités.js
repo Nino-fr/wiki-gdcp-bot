@@ -401,6 +401,7 @@ module.exports = class {
                       author: {
                         name: `@${authorName[1]}`,
                         icon_url: authorName[2],
+                        url: 'https://www.wattpad.com/user/' + authorName[1],
                       },
                       fields: [
                         {
@@ -409,11 +410,19 @@ module.exports = class {
                         },
                         {
                           name: 'Lectures',
-                          value: `${viewCount} (${viewCountPlus})`,
+                          value: `${viewCount}${
+                            viewCount !== viewCountPlus
+                              ? ` (${viewCountPlus})`
+                              : ''
+                          }`,
                         },
                         {
                           name: 'Votes',
-                          value: `${voteCount} (${voteCountPlus})`,
+                          value: `${voteCount}${
+                            voteCount !== voteCountPlus
+                              ? ` (${voteCountPlus})`
+                              : ''
+                          }`,
                         },
                         {
                           name: 'Chapitres',
@@ -446,6 +455,7 @@ module.exports = class {
                       author: {
                         name: `@${authorName[1]}`,
                         icon_url: authorName[2],
+                        url: 'https://www.wattpad.com/user/' + authorName[1],
                       },
                       fields: [
                         {
@@ -454,11 +464,19 @@ module.exports = class {
                         },
                         {
                           name: 'Lectures',
-                          value: `${viewCount} (${viewCountPlus})`,
+                          value: `${viewCount}${
+                            viewCount !== viewCountPlus
+                              ? ` (${viewCountPlus})`
+                              : ''
+                          }`,
                         },
                         {
                           name: 'Votes',
-                          value: `${voteCount} (${voteCountPlus})`,
+                          value: `${voteCount}${
+                            voteCount !== voteCountPlus
+                              ? ` (${voteCountPlus})`
+                              : ''
+                          }`,
                         },
                         {
                           name: 'Chapitres',
@@ -673,6 +691,7 @@ module.exports = class {
               author: {
                 name: `@${authorName[1]}`,
                 icon_url: authorName[2],
+                url: 'https://www.wattpad.com/user/' + authorName[1],
               },
               fields: [
                 {
@@ -681,11 +700,15 @@ module.exports = class {
                 },
                 {
                   name: 'Lectures',
-                  value: `${viewCount} (${viewCountPlus})`,
+                  value: `${viewCount}${
+                    viewCount !== viewCountPlus ? ` (${viewCountPlus})` : ''
+                  }`,
                 },
                 {
                   name: 'Votes',
-                  value: `${voteCount} (${voteCountPlus})`,
+                  value: `${voteCount}${
+                    voteCount !== voteCountPlus ? ` (${voteCountPlus})` : ''
+                  }`,
                 },
                 {
                   name: 'Chapitres',
@@ -718,6 +741,7 @@ module.exports = class {
               author: {
                 name: `@${authorName[1]}`,
                 icon_url: authorName[2],
+                url: 'https://www.wattpad.com/user/' + authorName[1],
               },
               fields: [
                 {
@@ -726,11 +750,15 @@ module.exports = class {
                 },
                 {
                   name: 'Lectures',
-                  value: `${viewCount} (${viewCountPlus})`,
+                  value: `${viewCount}${
+                    viewCount !== viewCountPlus ? ` (${viewCountPlus})` : ''
+                  }`,
                 },
                 {
                   name: 'Votes',
-                  value: `${voteCount} (${voteCountPlus})`,
+                  value: `${voteCount}${
+                    voteCount !== voteCountPlus ? ` (${voteCountPlus})` : ''
+                  }`,
                 },
                 {
                   name: 'Chapitres',
