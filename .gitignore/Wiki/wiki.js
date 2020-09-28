@@ -929,7 +929,10 @@ class Wiki {
           'https://pbs.twimg.com/profile_images/2854007123/5697810c2469f90473751c1b4ddd8aa6_400x400.jpeg',
           'https://www.instagram.com/sw_messenger/'
         )
-        .setDescription(lastSMPost.text)
+        .setDescription(
+          lastSMPost.text +
+            `\n\n[Voir la publication en entier](${lastSMPost.url})`
+        )
         .setImage(lastSMPost.thumbnail_src)
         .setFooter(
           lastSMPost.likes + ' likes • ' + lastSMPost.comments + ' commentaires'
