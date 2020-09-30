@@ -1,1 +1,1 @@
-worker: node setup.js && npm i instagram-posts
+worker: node setup.js
