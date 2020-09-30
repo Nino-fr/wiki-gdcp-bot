@@ -13,7 +13,7 @@ module.exports = async (username) => {
     const url = `https://instagram.com/${username}`;
     const {
       graphql: { user },
-    } = await got(url, { searchParams: { __a: 1 }, json: true });
+    } = await got(url, { searchParams: { __a: 1 } }).then((res) => res.json());
     const email = getEmails(user.biography).values().next().value || '';
 
     return {
