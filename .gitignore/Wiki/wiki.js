@@ -912,7 +912,7 @@ class Wiki {
    */
   async checkInstaPost() {
     const bot = require('../setup');
-    const instaPosts = require('instagram-posts');
+    const instaPosts = require('../instagram-posts');
     let lastSMPost;
     lastSMPost = await instaPosts('sw_messenger');
 
