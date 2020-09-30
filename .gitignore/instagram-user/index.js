@@ -11,6 +11,7 @@ module.exports = async (username) => {
 
   try {
     const url = `https://instagram.com/${username}`;
+    console.log(await got(url, { searchParams: { __a: 1 } }));
     const {
       graphql: { user },
     } = await got(url, { searchParams: { __a: 1 } }).json();
