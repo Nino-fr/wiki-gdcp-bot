@@ -914,11 +914,8 @@ class Wiki {
     const bot = require('../setup');
     const instaPosts = require('instagram-posts');
     let lastSMPost;
-    try {
-      lastSMPost = await instaPosts('sw_messenger');
-    } catch (err) {
-      console.log(err);
-    }
+    lastSMPost = await instaPosts('sw_messenger');
+
     lastSMPost = lastSMPost[0];
     if (
       (
