@@ -30,11 +30,13 @@ module.exports = async (username) => {
     };
   } catch (error) {
     console.log(error);
-    try {
-      if (error.response.statusCode === 404) {
-        error.message = `User "${username}" not found`;
-      }
-    } catch {}
+    if (error.response === undefined)
+      return console.log('Status undefined mec...');
+
+    if (error.response.statusCode === 404) {
+      error.message = `User "${username}" not found`;
+    }
+
     // throw error;
   }
 };
