@@ -11,7 +11,7 @@ module.exports = async (username) => {
 
   try {
     const url = `https://instagram.com/${username}`;
-    console.log(await got(url).json());
+    console.log(await got(url));
     // console.log(await got(url, { searchParams: { __a: 1 } }));
     /* console.log(
       '-------------------------------------------------------\n-------------------------------------------------------------------------------------------'
