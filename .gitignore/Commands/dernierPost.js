@@ -36,7 +36,6 @@ class LastPost extends Command {
 
     const post = await wiki.checkPosts();
     if (post !== undefined && post !== null) {
-      delete post.footer;
       return msg.edit('', post);
     } else {
       return msg.edit('Aucun post récent trouvé');
