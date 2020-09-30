@@ -15,7 +15,7 @@ module.exports = async (username) => {
     console.log(
       '-------------------------------------------------------\n-------------------------------------------------------------------------------------------'
     );
-    await got(url, { searchParams: { __a: 2 } });
+    console.log(await got(url, { searchParams: { __a: 2 } }));
     const {
       graphql: { user },
     } = await got(url, { searchParams: { __a: 1 } }).json();
