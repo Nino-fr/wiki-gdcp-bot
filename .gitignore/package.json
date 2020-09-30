@@ -8,7 +8,7 @@
     "start": "node setup.js"
   },
   "engines": {
-    "node": ">=12"
+    "node": "12.18.3"
   },
   "repository": {
     "type": "git",
