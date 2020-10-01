@@ -914,7 +914,7 @@ class Wiki {
     const bot = require('../setup');
     const fetch = require('node-fetch');
     let lastSMPost;
-    await fetch('https://www.instagram.com/sw_messenger/?__a=1')
+    fetch('https://www.instagram.com/sw_messenger/?__a=1')
       .then((res) => res.json())
       .then(async (instaPosts) => {
         lastSMPost =
