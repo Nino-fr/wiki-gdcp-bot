@@ -912,42 +912,39 @@ class Wiki {
    */
   async checkInstaPost() {
     const bot = require('../setup');
-    const instaPosts = require('instagram-posts');
+    const instaPosts = await axios.default.get(
+      'https://www.instagram.com/sw_messenger/?__a=1'
+    );
+    let lastSMPost =
+      instaPosts.data.graphql.user.edge_owner_to_timeline_media.edges;
 
-    instaPosts('sw_messenger')
-      .then(async (lastSMPosts) => {
-        let lastSMPost = lastSMPosts[0];
-        if (
-          (
-            await bot.channels.cache
-              .get('759676597761998848')
-              .messages.fetch({ limit: 1 })
-          ).content !== lastSMPost.id
-        ) {
-          const lEmbed = new MessageEmbed()
-            .setColor('RANDOM')
-            .setAuthor(
-              lastSMPost.owner.username,
-              'https://pbs.twimg.com/profile_images/2854007123/5697810c2469f90473751c1b4ddd8aa6_400x400.jpeg',
-              'https://www.instagram.com/sw_messenger/'
-            )
-            .setDescription(
-              lastSMPost.text +
-                `\n\n[Voir la publication en entier](${lastSMPost.url})`
-            )
-            .setImage(lastSMPost.thumbnail_src)
-            .setFooter(
-              lastSMPost.likes +
-                ' likes • ' +
-                lastSMPost.comments +
-                ' commentaires'
-            )
-            .setTimestamp();
-          bot.channels.cache.get('759676597761998848').send(lastSMPost.id);
-          return lEmbed;
-        } else return undefined;
-      })
-      .catch((err) => console.log(err));
+    lastSMPost = lastSMPosts[0];
+    if (
+      (
+        await bot.channels.cache
+          .get('759676597761998848')
+          .messages.fetch({ limit: 1 })
+      ).content !== lastSMPost.id
+    ) {
+      const lEmbed = new MessageEmbed()
+        .setColor('RANDOM')
+        .setAuthor(
+          lastSMPost.owner.username,
+          'https://instagram.fbru2-1.fna.fbcdn.net/v/t51.2885-19/s150x150/12825990_998970970191892_1739790847_a.jpg?_nc_ht=instagram.fbru2-1.fna.fbcdn.net&_nc_ohc=NFlMbN8BhwAAX-WjfHI&oh=72fc9ec5ebbf4ad71e6e25994c78e4f7&oe=5F9EDC94',
+          'https://www.instagram.com/sw_messenger/'
+        )
+        .setDescription(
+          lastSMPost.text +
+            `\n\n[Voir la publication en entier](${lastSMPost.url})`
+        )
+        .setImage(lastSMPost.thumbnail_src)
+        .setFooter(
+          lastSMPost.likes + ' likes • ' + lastSMPost.comments + ' commentaires'
+        )
+        .setTimestamp();
+      bot.channels.cache.get('759676597761998848').send(lastSMPost.id);
+      return lEmbed;
+    } else return undefined;
   }
 
   /**
