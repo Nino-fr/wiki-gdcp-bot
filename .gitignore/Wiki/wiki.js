@@ -915,7 +915,7 @@ class Wiki {
     const fetch = require('node-fetch');
     let lastSMPost;
     fetch('https://www.instagram.com/sw_messenger/?__a=1', {
-      cache: 'only-if-cached',
+      cache: 'force-cache',
     })
       .then((res) => res.json())
       .then(async (instaPosts) => {
