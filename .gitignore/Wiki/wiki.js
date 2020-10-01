@@ -913,36 +913,41 @@ class Wiki {
   async checkInstaPost() {
     const bot = require('../setup');
     const instaPosts = require('instagram-posts');
-    let lastSMPost;
-    lastSMPost = await instaPosts('sw_messenger');
 
-    lastSMPost = lastSMPost[0];
-    if (
-      (
-        await bot.channels.cache
-          .get('759676597761998848')
-          .messages.fetch({ limit: 1 })
-      ).content !== lastSMPost.id
-    ) {
-      const lEmbed = new MessageEmbed()
-        .setColor('RANDOM')
-        .setAuthor(
-          lastSMPost.owner.username,
-          'https://pbs.twimg.com/profile_images/2854007123/5697810c2469f90473751c1b4ddd8aa6_400x400.jpeg',
-          'https://www.instagram.com/sw_messenger/'
-        )
-        .setDescription(
-          lastSMPost.text +
-            `\n\n[Voir la publication en entier](${lastSMPost.url})`
-        )
-        .setImage(lastSMPost.thumbnail_src)
-        .setFooter(
-          lastSMPost.likes + ' likes • ' + lastSMPost.comments + ' commentaires'
-        )
-        .setTimestamp();
-      bot.channels.cache.get('759676597761998848').send(lastSMPost.id);
-      return lEmbed;
-    } else return undefined;
+    instaPosts('sw_messenger')
+      .then(async (lastSMPosts) => {
+        let lastSMPost = lastSMPosts[0];
+        if (
+          (
+            await bot.channels.cache
+              .get('759676597761998848')
+              .messages.fetch({ limit: 1 })
+          ).content !== lastSMPost.id
+        ) {
+          const lEmbed = new MessageEmbed()
+            .setColor('RANDOM')
+            .setAuthor(
+              lastSMPost.owner.username,
+              'https://pbs.twimg.com/profile_images/2854007123/5697810c2469f90473751c1b4ddd8aa6_400x400.jpeg',
+              'https://www.instagram.com/sw_messenger/'
+            )
+            .setDescription(
+              lastSMPost.text +
+                `\n\n[Voir la publication en entier](${lastSMPost.url})`
+            )
+            .setImage(lastSMPost.thumbnail_src)
+            .setFooter(
+              lastSMPost.likes +
+                ' likes • ' +
+                lastSMPost.comments +
+                ' commentaires'
+            )
+            .setTimestamp();
+          bot.channels.cache.get('759676597761998848').send(lastSMPost.id);
+          return lEmbed;
+        } else return undefined;
+      })
+      .catch((err) => console.log(err));
   }
 
   /**
