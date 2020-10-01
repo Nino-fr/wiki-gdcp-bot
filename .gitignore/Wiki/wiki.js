@@ -912,13 +912,13 @@ class Wiki {
    */
   async checkInstaPost() {
     const bot = require('../setup');
-    const instaPosts = await axios.default.get(
+    const instaPosts = await require('axios').default.get(
       'https://www.instagram.com/sw_messenger/?__a=1'
     );
     let lastSMPost =
       instaPosts.data.graphql.user.edge_owner_to_timeline_media.edges;
 
-    lastSMPost = lastSMPosts[0];
+    lastSMPost = lastSMPost[0];
     if (
       (
         await bot.channels.cache
