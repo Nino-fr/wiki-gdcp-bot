@@ -916,9 +916,8 @@ class Wiki {
       'https://www.instagram.com/sw_messenger/?__a=1'
     );
     let lastSMPost =
-      instaPosts.data.graphql.user.edge_owner_to_timeline_media.edges;
+      instaPosts.data.graphql.user.edge_owner_to_timeline_media.edges[0];
 
-    lastSMPost = lastSMPost[0];
     if (
       (
         await bot.channels.cache
