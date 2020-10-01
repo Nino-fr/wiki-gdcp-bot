@@ -912,12 +912,14 @@ class Wiki {
    */
   async checkInstaPost() {
     const bot = require('../setup');
-    const instaPosts = await require('axios').default.get(
-      'https://www.instagram.com/sw_messenger/?__a=1'
-    );
-    let lastSMPost =
-      instaPosts.data.graphql.user.edge_owner_to_timeline_media.edges[0];
-
+    const fetch = require('node-fetch');
+    let lastSMPost;
+    await fetch('https://www.instagram.com/sw_messenger/?__a=1')
+      .then((res) => res.json())
+      .then(async (instaPosts) => {
+        lastSMPost =
+          instaPosts.graphql.user.edge_owner_to_timeline_media.edges[0].node;
+      });
     if (
       (
         await bot.channels.cache
@@ -933,12 +935,15 @@ class Wiki {
           'https://www.instagram.com/sw_messenger/'
         )
         .setDescription(
-          lastSMPost.text +
+          lastSMPost.edge_media_to_caption.edges[0].node.text +
             `\n\n[Voir la publication en entier](${lastSMPost.url})`
         )
         .setImage(lastSMPost.thumbnail_src)
         .setFooter(
-          lastSMPost.likes + ' likes • ' + lastSMPost.comments + ' commentaires'
+          lastSMPost.edge_liked_by.count +
+            ' likes • ' +
+            lastSMPost.edge_media_to_comment.count +
+            ' commentaires'
         )
         .setTimestamp();
       bot.channels.cache.get('759676597761998848').send(lastSMPost.id);

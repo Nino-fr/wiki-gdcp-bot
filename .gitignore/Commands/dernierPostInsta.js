@@ -30,7 +30,9 @@ class newsInsta extends Command {
    */
   async run(message) {
     const bot = this.bot;
-    const msg = await message.channel.send(':discord_loading: Chargement...');
+    const msg = await message.channel.send(
+      '<a:discord_loading:756866921370222634> Chargement...'
+    );
     await bot.channels.cache.get('759676597761998848').send('lol');
 
     const post = await wiki.checkInstaPost();
