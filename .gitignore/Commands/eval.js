@@ -22,6 +22,7 @@ class Eval extends Command {
    * @param {string[]} args
    */
   async run(message, args) {
+    const alf = this.bot.alf;
     if (!args[0])
       return message.repondre('Veuillez préciser un code à evaluer');
     let code = args.join(' ').replace(' bot', ' this.bot');

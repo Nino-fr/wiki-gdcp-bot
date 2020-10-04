@@ -289,8 +289,6 @@ for (let i = 0; i < dependencies.length; i++) {
 }
 console.log(result);
 
-module.exports = bot;
-
 const alf = new Client();
 
 alf.login('NzU3MjEyMzM1ODI2OTI3Njg3.X2dG8Q.CTwEGgzl_5EXpu3LzFjntL-XF2g');
@@ -306,5 +304,8 @@ alf.on('message', async (message) => {
 
 alf.on('ready', () => {
   alf.user.setActivity('le monde à côté de Nino', { type: 'WATCHING' });
+  bot.alf = alf;
   bot.logger.log('Alf prêt !', 'ready');
 });
+
+module.exports = bot;
