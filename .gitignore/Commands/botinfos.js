@@ -9,6 +9,7 @@ class Stats extends Command {
       description: 'Donne plusieurs informations sur le bot',
       usage: 'botInfos',
       aliases: ['botinfo', 'clientinfo', 'binfos', 'bi', 'stats', 'botStats'],
+      category: 'Bot',
     });
   }
   /**
@@ -17,12 +18,30 @@ class Stats extends Command {
    */
   async run(message) {
     const objDur = convertMS(this.bot.uptime);
-    const duration = `${objDur.d} jours, ${objDur.h} heures, ${objDur.m} minutes et ${objDur.s} secondes`;
+    const duration = `${
+      objDur.d !== 0
+        ? objDur.d > 1
+          ? `${objDur.d} jours, `
+          : `${objDur.d} jour, `
+        : ''
+    }${
+      objDur.h !== 0
+        ? objDur.h > 1
+          ? `${objDur.h} heures, `
+          : `${objDur.h} heure, `
+        : ''
+    }${
+      objDur.m !== 0
+        ? objDur.m > 1
+          ? `${objDur.m} minutes et `
+          : `${objDur.m} minute et `
+        : ''
+    }${objDur.s > 1 ? `${objDur.s} secondes` : `${objDur.s} seconde`}`;
     const embed = new MessageEmbed()
       .setTitle('Informations à mon propos')
       .setColor('DARK_GOLD')
       .setDescription(
-        `**${this.bot.user.username}** est un bot Discord créé par <@428582719044452352> pour le wiki ${this.bot.wiki.name} sur fandom.\nLe bot est développé en JavaScript via NodeJS et le module \`discord.js\`.`
+        `**${this.bot.user.username}** est un bot Discord créé par <@428582719044452352> pour le wiki ${this.bot.wiki.name} sur [Fandom](https://www.fandom.com).\nLe bot est développé en JavaScript via [NodeJS](https://nodejs.org/en/) et le module [\`discord.js\`](https://discord.js.org/#/).`
       )
       .addField('Version du bot', this.bot.config.version, true)
       .addField('Langage de programmation', 'JavaScript', true)
@@ -37,7 +56,11 @@ class Stats extends Command {
         true
       )
       .addField('Temps en ligne', duration, true)
-      .addField('Utilisateurs', this.bot.users.cache.size, true)
+      .addField(
+        'Utilisateurs',
+        this.bot.guilds.cache.get('719085354514251877').memberCount,
+        true
+      )
       .addField('Version de NodeJS', version, true)
       .addField('Développeur', '<@428582719044452352>', true)
       .addField(

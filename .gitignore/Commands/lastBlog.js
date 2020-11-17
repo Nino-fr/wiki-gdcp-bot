@@ -20,17 +20,17 @@ class LastBlog extends Command {
    * @param {Message} message
    */
   async run(message) {
-    const bot = this.bot;
     const msg = await message.channel.send(
       '<a:discord_loading:756866921370222634> Chargement...'
     );
-    await bot.channels.cache.get('751855074657042594').send('lol');
 
     wiki.checkBlogsPosted().then(async (blog) => {
       if (blog !== undefined && blog !== null) {
         return msg.edit('', blog);
       } else {
-        return msg.edit('Aucun billet de blog récent trouvé');
+        return msg.edit(
+          '<a:check_cross:767021936185442366> Une erreur est survenue, veuillez réessayer.'
+        );
       }
     });
   }

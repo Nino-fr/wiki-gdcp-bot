@@ -10,6 +10,7 @@ class Say extends Command {
       aliases: ['say', 'repeat'],
       guildOnly: true,
       permLevel: 'Administrateur',
+      category: 'Bot',
     });
   }
 

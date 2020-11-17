@@ -9,9 +9,8 @@ class Search extends Command {
     super({
       name: 'recherche',
       description:
-        'Rechercher dans les articles du wiki (ajoutez +users pour rechercher dans les utilisateurs ou +commentaires pour rechercher dans les commentaires ou encore +all pour rechercher dans tout le wiki)',
-      usage:
-        "recherche <ce qu'il faut rechercher> [+users | +commentaires | +all]",
+        'Rechercher dans les articles du wiki (vous pouvez ajouter des filtres différents à la recherche pour rechercher plus précisément : `+utilisateurs` pour rechercher dans les utilisateurs, `+commentaires` pour rechercher dans les commentaires, `+blog` pour rechercher dans les blogs des utilisateurs, `+discusBlog` pour rechercher dans les commentaires des blogs, `+fichiers` pour rechercher dans les fichiers, `+mur` pour rechercher dans les murs, `+catégorie` pour rechercher dans les catégories ou encore `+tout` pour rechercher dans tout le wiki)',
+      usage: "recherche <ce qu'il faut rechercher> [+filtre]",
       aliases: [
         'rechercher',
         'search',
@@ -32,12 +31,20 @@ class Search extends Command {
       const wiki = this.bot.wiki;
       if (!args[0] || args.join(' ') === '')
         return message.repondre("Veuillez préciser ce qu'il faut rechercher");
-      if (/\+\s*[^\s]+/.test(args.join(' '))) {
-        const toSearch = args.join(' ').replace(/\+\s*[^\s]+/g, '');
-        const filter = args.join(' ').match(/\+\s*([^\s]+)/)[1];
+      if (/\+[^\s]+/.test(args.join(' '))) {
+        if (args.join(' ').match(/\+[^\s]+/g)[1])
+          return message.repondre(
+            '<a:check_cross:767021936185442366> Vous ne pouvez pas ajouter plusieurs filtres de recherche. Un seul filtre est autorisé.'
+          );
+        const toSearch = args.join(' ').replace(/\+[^\s]+/g, '');
+        const filter = args.join(' ').match(/\+([^\s]+)/)[1];
         await wiki
           .search(toSearch, filter)
-          .then((result) => message.repondre(result));
+          .then((result) =>
+            result !== undefined
+              ? message.repondre(result)
+              : message.repondre('Aucun résultat trouvé')
+          );
       } else {
         await wiki
           .search(args.join(' '))
@@ -48,8 +55,15 @@ class Search extends Command {
           );
       }
     } catch (err) {
-      message.repondre(err.message);
-      console.log(err.message, err.stack);
+      console.log(err);
+      message.repondre({
+        embed: {
+          title: 'Une erreur est survenue',
+          description:
+            ':warning: Une erreur est survenue avec la commande. Si cette erreur se reproduit, veuillez contacter mon créateur <@428582719044452352>',
+          color: '#f94343',
+        },
+      });
     }
   }
 }

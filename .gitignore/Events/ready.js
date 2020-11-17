@@ -19,15 +19,15 @@ module.exports = class {
 
     // Initialisons le statut du bot
     await bot.user.setActivity(
-      `${bot.settings.get('settings').prefix}help • ${
-        bot.users.cache.size
-      } utilisateurs`
+      `envoyer ${bot.settings.get('settings').prefix}aide pour la page d'aide`
     );
     bot.logger.log(`${bot.commands.size} commandes`, 'log');
 
     // Mettre un message en console qui indique que le bot est prêt.
     bot.logger.log(
-      `${bot.user.tag}, prêt à servir ${bot.users.cache.size} utilisateurs dans ${bot.guilds.cache.size} serveurs.`,
+      `${bot.user.tag}, prêt à servir ${
+        bot.guilds.cache.get('719085354514251877').memberCount
+      } utilisateurs dans ${bot.guilds.cache.size} serveurs.`,
       'ready'
     );
   }

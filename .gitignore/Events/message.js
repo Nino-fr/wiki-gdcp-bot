@@ -26,9 +26,14 @@ module.exports = class {
     const prefixMention = new RegExp(`^<@!?${bot.user.id}> ?$`);
     if (message.content.match(prefixMention)) {
       return message.channel.send(
-        `Mon prefix est \`${set.prefix}\` Écris \`${set.prefix}help\` pour la liste des commandes.`
+        `Mon prefix est \`${set.prefix}\`\nUtilisez la commande \`${set.prefix}aide\` pour voir ma page d'aide ou la commande \`${set.prefix}présentation\` pour une brêve présentation.`
       );
     }
+
+    if (message.content === ';')
+      return message.repondre(
+        'Si tu envoies mon préfix sans commande, je ne peux rien pour toi...'
+      );
 
     if (message.content.indexOf(set.prefix) !== 0) return;
 
@@ -49,7 +54,7 @@ module.exports = class {
     if (level < bot.levelCache[cmd.conf.permLevel]) {
       if (set.systemNotice === 'true') {
         return message.channel
-          .send(`Vous n'avez pas la permission d'utiliser cette commande. Votre niveau de permission : ${level} (${
+          .send(`<a:check_cross:767021936185442366> Vous n'avez pas la permission d'utiliser cette commande. Votre niveau de permission : ${level} (${
           bot.config.permLevels.find((l) => l.level === level).name
         })
 Cette commande nécessite le niveau de permission ${

@@ -1,17 +1,13 @@
 const { ownerID } = require('./config.js');
 
 const bot = require('./setup.js'),
-  { Message, MessageEmbed } = require('discord.js'),
+  { Message, MessageEmbed, TextChannel } = require('discord.js'),
   regWiki = /https:\/\/gardiens-des-cites-perdues.fandom.com\/fr\/wiki\/[^\s]+/,
   axios = require('axios'),
   prefix = bot.config.settings.prefix,
-  moment = require('moment'),
-  { getValues } = require('./fonctions'),
+  { getValues, HTTPSRequest, HTTPRequest } = require('./fonctions'),
   loguer = bot.logger.log,
-  asc = require('./ascii.json'),
-  colours = require('./colours.json');
-
-moment.locale('fr');
+  asc = require('./ascii.json');
 
 module.exports = class {
   /**
@@ -19,7 +15,11 @@ module.exports = class {
    * @param {Message} message Le message détecté
    */
   async run(message) {
-    if (regWiki.test(message.content) && bot.wikiVisu === true) {
+    if (
+      regWiki.test(message.content) &&
+      bot.wikiVisu === true &&
+      !message.channel.name.includes('annonce')
+    ) {
       message.content.match(new RegExp(regWiki, 'g')).forEach(async (url) => {
         if (!url) return;
         url = decodeURI(url);
@@ -67,11 +67,12 @@ module.exports = class {
         },
       });
     }
+
     // Deux conditions créant une prévisualisation des liens Discord vers des messages.
     if (
-      message.content.includes(
-        'https://discord.com/channels/' && bot.discordVisu
-      )
+      message.content.includes('https://discord.com/channels/') &&
+      bot.discordVisu &&
+      !message.channel.name.includes('annonce')
     ) {
       try {
         if (message.author.bot) return;
@@ -82,20 +83,14 @@ module.exports = class {
         let serveur = bot.guilds.cache.get(serveurid);
         let salonid = mmm.substring(48, 66);
         let messageid = mmm.substring(67, 86);
+        /**
+         * @type {TextChannel}
+         */
         let salon = bot.channels.cache.get(salonid);
         let lien = mmm;
-
         await salon.messages.fetch(messageid).then((m) => {
-          if (m.embeds.length !== 0) {
-            message.repondre(
-              'Ce message contenait un embed. En voici une représentation ci-dessous.'
-            );
-            return message.channel.send({
-              embed: m.embeds[0],
-            });
-          }
           let mEmbed = {
-            color: colours.blue_dark,
+            color: '#061499',
             title: `Message de ${m.author.tag}`,
             description: `${m.content}\n\n[Sauter vers le message](${lien})`,
             footer: {
@@ -106,9 +101,18 @@ module.exports = class {
           if (m.attachments.first())
             mEmbed.image = { url: m.attachments.first().url };
 
-          return message.channel.send({
-            embed: mEmbed,
-          });
+          if (m.content && m.content !== '')
+            message.channel.send({
+              embed: mEmbed,
+            });
+          if (m.embeds.length !== 0) {
+            message.channel.send(
+              'Ce message contenait un embed. En voici une représentation ci-dessous.'
+            );
+            return message.channel.send({
+              embed: m.embeds[0],
+            });
+          }
         });
       } catch (err) {
         console.log(err);
@@ -117,7 +121,8 @@ module.exports = class {
     // La deuxième condition qui fait pareil mais avec les liens `discordapp.com`
     if (
       message.content.includes('https://discordapp.com/channels/') &&
-      bot.discordVisu
+      bot.discordVisu &&
+      !message.channel.name.includes('annonce')
     ) {
       try {
         if (message.author.bot) return;
@@ -128,19 +133,14 @@ module.exports = class {
         let serveur = bot.guilds.cache.get(serveurid);
         let salonid = mmm.substring(51, 69);
         let messageid = mmm.substring(70, 89);
+        /**
+         * @type {TextChannel}
+         */
         let salon = bot.channels.cache.get(salonid);
         let lien = mmm;
         await salon.messages.fetch(messageid).then((m) => {
-          if (m.embeds.length !== 0) {
-            message.repondre(
-              'Ce message contenait un embed. En voici une représentation ci-dessous.'
-            );
-            return message.channel.send({
-              embed: m.embeds[0],
-            });
-          }
           let mEmbed = {
-            color: colours.blue_dark,
+            color: 12124160,
             title: `Message de ${m.author.tag}`,
             description: `${m.content}\n\n[Sauter vers le message](${lien})`,
             footer: {
@@ -151,9 +151,19 @@ module.exports = class {
           if (m.attachments.first())
             mEmbed.image = { url: m.attachments.first().url };
 
-          return message.channel.send({
-            embed: mEmbed,
-          });
+          if (m.content && m.content !== '')
+            message.channel.send({
+              embed: mEmbed,
+            });
+
+          if (m.embeds.length !== 0) {
+            message.channel.send(
+              'Ce message contenait un embed. En voici une représentation ci-dessous.'
+            );
+            return message.channel.send({
+              embed: m.embeds[0],
+            });
+          }
         });
       } catch (err) {
         console.log(err);
@@ -161,9 +171,11 @@ module.exports = class {
     }
 
     // Deux conditions permettant d'envoyer un embed de prévisualisation des liens YouTube
-    if (/https\:\/\/youtu\.be\/[\w\d\-]+/.test(message.content) && bot.YTVisu) {
-      const { convertMS } = require('./fonctions');
-
+    if (
+      /https\:\/\/youtu\.be\/[\w\d\-]+/.test(message.content) &&
+      bot.YTVisu &&
+      !message.channel.name.includes('annonce')
+    ) {
       let regYt = /https\:\/\/youtu\.be\/[\w\d\-]+/;
       let url = message.content.match(regYt);
       let videoId = message.content
@@ -180,18 +192,28 @@ module.exports = class {
       let views = ytdvideo.data.items[0].statistics.viewCount;
       let commentCount = ytdvideo.data.items[0].statistics.commentCount;
 
-      const { getInfo } = require('ytdl-getinfo');
       let title, description, owner, urlowner, duration, totalduration;
       const fetchVideoInfo = require('updated-youtube-info');
-      await getInfo(url.toString()).then((info) => {
-        let item = info.items[0];
-        description = item.description;
-        title = item.fulltitle;
-        owner = item.uploader;
-        urlowner = item.uploader_url;
-        totalduration = convertMS(parseInt(item.duration + '000'));
-        duration = `${totalduration.h} heures ${totalduration.m} minutes et ${totalduration.s} secondes`;
-      });
+      await axios.default
+        .get(
+          `https://www.googleapis.com/youtube/v3/videos?part=snippet&part=contentDetails&id=${videoId}&key=AIzaSyBIvSnYmTSRxjnyeDf106P1FsBqkngTKXs`
+        )
+        .then((res) => {
+          let info = res.data;
+          let item = info.items[0].snippet,
+            channelId = item.channelId;
+          description = item.description;
+          title = item.title;
+          owner = item.channelTitle;
+          totalduration = info.items[0].contentDetails.duration
+            .replace(/(\d+)M/i, ` $1 minutes`)
+            .replace(/(\d+)S/i, ` $1 secondes`)
+            .replace(/(\d+)H/i, `$1 heures,`)
+            .replace('PT', '');
+
+          urlowner = `https://www.youtube.com/channel/${channelId}`;
+        });
+
       let video = await fetchVideoInfo(videoId);
       message.channel.send({
         embed: {
@@ -200,19 +222,14 @@ module.exports = class {
             {
               name: 'Description',
               value:
-                description.length > 1300
-                  ? description
-                      .slice(0, 1300)
-                      .split(/ +/g)
-                      .splice(
-                        description.slice(0, 1300).split(/ +/g).length - 2
-                      )
-                      .join(' ') + ` [\[...\]](${url})`
+                description.length > 900
+                  ? description.slice(0, 900).split(/ +/g).splice(1).join(' ') +
+                    ` [\[...\]](${url})`
                   : description,
             },
             {
               name: '⏲️ Durée de la vidéo',
-              value: duration,
+              value: totalduration,
               inline: true,
             },
             {
@@ -252,10 +269,9 @@ module.exports = class {
       /https\:\/\/www\.youtube\.com\/watch\?v\=[\w\d\-]+/.test(
         message.content
       ) &&
-      bot.YTVisu
+      bot.YTVisu &&
+      !message.channel.name.includes('annonce')
     ) {
-      const { convertMS } = require('./fonctions');
-
       let regYt = /https\:\/\/www\.youtube\.com\/watch\?v\=[\w\d\-]+/;
       let url = message.content.match(regYt);
       let videoId = message.content
@@ -263,7 +279,6 @@ module.exports = class {
         .toString()
         .match(/(?<=https:\/\/www.youtube.com\/watch\?v=)[\w\d\-]+/)
         .toString();
-      // const fetch = require('node-fetch');
       const axios = require('axios');
       let ytdvideo = await axios.default.get(
         `https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoId}&key=AIzaSyBIvSnYmTSRxjnyeDf106P1FsBqkngTKXs`
@@ -275,18 +290,28 @@ module.exports = class {
       let views = ytdvideo.items[0].statistics.viewCount;
       let commentCount = ytdvideo.items[0].statistics.commentCount;
 
-      const { getInfo } = require('ytdl-getinfo');
       let title, description, owner, urlowner, duration, totalduration;
       const fetchVideoInfo = require('updated-youtube-info');
-      await getInfo(url.toString()).then((info) => {
-        let item = info.items[0];
-        description = item.description;
-        title = item.fulltitle;
-        owner = item.uploader;
-        urlowner = item.uploader_url;
-        totalduration = convertMS(parseInt(item.duration + '000'));
-        duration = `${totalduration.h} heures ${totalduration.m} minutes et ${totalduration.s} secondes`;
-      });
+      await axios.default
+        .get(
+          `https://www.googleapis.com/youtube/v3/videos?part=snippet&part=contentDetails&id=${videoId}&key=AIzaSyBIvSnYmTSRxjnyeDf106P1FsBqkngTKXs`
+        )
+        .then((res) => {
+          let info = res.data;
+          let item = info.items[0].snippet,
+            channelId = item.channelId;
+          description = item.description;
+          title = item.title;
+          owner = item.channelTitle;
+          totalduration = info.items[0].contentDetails.duration
+            .replace(/(\d+)M/i, ` $1 minutes`)
+            .replace(/(\d+)S/i, ` $1 secondes`)
+            .replace(/(\d+)H/i, `$1 heures,`)
+            .replace('PT', '');
+
+          urlowner = `https://www.youtube.com/channel/${channelId}`;
+        });
+
       let video = await fetchVideoInfo(videoId);
       message.channel.send({
         embed: {
@@ -295,19 +320,14 @@ module.exports = class {
             {
               name: 'Description',
               value:
-                description.length > 1300
-                  ? description
-                      .slice(0, 1300)
-                      .split(/ +/g)
-                      .splice(
-                        description.slice(0, 1300).split(/ +/g).length - 2
-                      )
-                      .join(' ') + ` [\[...\]](${url})`
+                description.length > 900
+                  ? description.slice(0, 900).split(/ +/g).splice(1).join(' ') +
+                    ` [\[...\]](${url})`
                   : description,
             },
             {
               name: '⏲️ Durée de la vidéo',
-              value: duration,
+              value: totalduration,
               inline: true,
             },
             {
@@ -345,166 +365,163 @@ module.exports = class {
     }
 
     let mywtt = /https:\/\/my.w.tt\/[^ ]+/gi;
-    if (/https:\/\/my.w.tt\/[^ ]+/gi.test(message.content) && bot.wattyVisu) {
+    if (
+      /https:\/\/my.w.tt\/[^ ]+/gi.test(message.content) &&
+      bot.wattyVisu &&
+      !message.channel.name.includes('annonce')
+    ) {
       let lienAndroid = message.content.match(mywtt)[0];
-      await axios.default.get(lienAndroid).then(async (result) => {
+      HTTPSRequest(lienAndroid).then(async (result) => {
         let regStory = /getElementById\("l"\).src\s*=\s*validate\("nullstory\/((?:.(?!\(;\s*))+)"\);\s*window.setTimeout\(function\(\)\s*\{\s*\s*if\s*\(!hasURI\)\s*\{\s*\s*window.top.location\s*=\s*validate\("((?:.(?!\(;\s*))+)"\);\s*\s*}\s*\s*intervalExecuted\s*=\s*true;\s*},\s*\d+\);\s*};\s*window.onblur\s*=\s*function\(\)\s*\{\s*hasURI\s*=\s*true;\s*};\s*window.onfocus\s*=\s*function\(\)\s*\{\s*if\s*\(hasURI\)\s*\{\s*\s*window.top.location\s*=\s*validate\("((?:.(?!\(;\s*))+)"\);\s*}\s*else\s*if\(intervalExecuted\)\s*\{\s*\s*window.top.location\s*=\s*validate\("((?:.(?!\(;\s*))+)"\);\s*}\s*}\s*<\/script/;
         let regUser = /getElementById\("l"\).src\s*=\s*validate\("nulluser\/((?:.(?!\(;\s*))+)"\);\s*window.setTimeout\(function\(\)\s*\{\s*\s*if\s*\(!hasURI\)\s*\{\s*\s*window.top.location\s*=\s*validate\("https:\/\/www.wattpad.com\/user\/((?:.(?!\(;\s*))+)"\);\s*\s*}\s*\s*intervalExecuted\s*=\s*true;\s*},\s*\d+\);\s*};\s*window.onblur\s*=\s*function\(\)\s*\{\s*hasURI\s*=\s*true;\s*};\s*window.onfocus\s*=\s*function\(\)\s*\{\s*if\s*\(hasURI\)\s*\{\s*\s*window.top.location\s*=\s*validate\("((?:.(?!\(;\s*))+)"\);\s*}\s*else\s*if\(intervalExecuted\)\s*\{\s*\s*window.top.location\s*=\s*validate\("((?:.(?!\(;\s*))+)"\);\s*}\s*}\s*<\/script/;
-        if (regStory.test(result.data)) {
-          let lienOrdi = await result.data.match(regStory)[3];
-          await axios.default.get(lienOrdi).then(async (ress) => {
-            await axios.default
-              .get(
-                ress.data.match(
-                  /<link rel="canonical" href="((?:.(?! ))+)" \/>/
-                )[1]
-              )
-              .then(async (res) => {
-                let alles = await res.data.match(
-                  /<img src="(https:\/\/a\.wattpad\.com\/cover\/[\d\w]+\-[\d\w]+\-[\d\w]+\.jpg)" height="\d+" width="\d+" alt="(?:.(?!><))+">\s?<\/div>\s?<h1>\s?((?:.(?!\/h1>))+)\s?<\/h1>/
-                );
-                let nameOfStory = alles[2];
-                let ascii = /&#x(\d+);/g;
-                if (ascii.test(nameOfStory)) {
-                  let pesto = await nameOfStory.match(ascii);
 
-                  let authorName = res.data.match(
-                    /<a href="\/user\/((?:.(?! ))+)" class="(?:.(?!>))+">\s?<img src="(https:\/\/a\.wattpad\.com\/useravatar\/(?:.(?!\d+\.\d+))+\.\d+\.\d+\.jpg)" width="\d+" height="\d+" alt="((?:.(?! \/))+)" \/>\s?<\/a>/
+        if (regStory.test(result)) {
+          let lienOrdi = await result.match(regStory)[3];
+          HTTPSRequest(lienOrdi).then(async (ress) => {
+            HTTPSRequest(
+              ress.match(/<link rel="canonical" href="((?:.(?! ))+)" \/>/)[1]
+            ).then(async (res) => {
+              let alles = await res.match(
+                /<img src="(https:\/\/a\.wattpad\.com\/cover\/[\d\w]+\-[\d\w]+\-[\d\w]+\.jpg)" height="\d+" width="\d+" alt="(?:.(?!><))+">\s?<\/div>\s?<h1>\s?((?:.(?!\/h1>))+)\s?<\/h1>/
+              );
+              let nameOfStory = alles[2];
+              let ascii = /&#x(\d+);/g;
+              if (ascii.test(nameOfStory)) {
+                let pesto = await nameOfStory.match(ascii);
+
+                let authorName = res.match(
+                  /<a href="\/user\/((?:.(?! ))+)" class="(?:.(?!>))+">\s?<img src="(https:\/\/a\.wattpad\.com\/useravatar\/(?:.(?!\d+\.\d+))+\.\d+\.\d+\.jpg)" width="\d+" height="\d+" alt="((?:.(?! \/))+)" \/>\s?<\/a>/
+                );
+                let reginfo = /<span data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Reads))+)\s?Reads">\s?((?:[\dKk,\. ](?!Reads))+)\s?Reads<\/span>\s?<span\s?data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Votes))+)\s?Votes">\s?((?:[\dKk,\. ](?!Votes))+)\s?Votes<\/span>\s?<span>([\d]+)\s?Part\s?Story<\/span>\s?<\/div>\s?<div\s?class="promotion-description-story-details">\s<\/div>/i;
+                let infosStory = await res.match(reginfo);
+                loguer(reginfo.test(res));
+                let coverURL = await alles[1];
+                let viewCount = await infosStory[2];
+                let viewCountPlus = await infosStory[1];
+                let voteCountPlus = await infosStory[3];
+                let voteCount = await infosStory[4];
+                let chapterCount = await infosStory[5];
+                for (let i of pesto) {
+                  nameOfStory = await nameOfStory.replace(
+                    ascii,
+                    String.fromCharCode(
+                      getValues(asc, i.match(/\d+/).toString())
+                    )
                   );
-                  let reginfo = /<span data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Reads))+)\s?Reads">\s?((?:[\dKk,\. ](?!Reads))+)\s?Reads<\/span>\s?<span\s?data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Votes))+)\s?Votes">\s?((?:[\dKk,\. ](?!Votes))+)\s?Votes<\/span>\s?<span>([\d]+)\s?Part\s?Story<\/span>\s?<\/div>\s?<div\s?class="promotion-description-story-details">\s<\/div>/i;
-                  let infosStory = await res.data.match(reginfo);
-                  loguer(reginfo.test(res.data));
-                  let coverURL = await alles[1];
-                  let viewCount = await infosStory[2];
-                  let viewCountPlus = await infosStory[1];
-                  let voteCountPlus = await infosStory[3];
-                  let voteCount = await infosStory[4];
-                  let chapterCount = await infosStory[5];
-                  for (let i of pesto) {
-                    nameOfStory = await nameOfStory.replace(
+                }
+                loguer(pesto);
+                message.repondre({
+                  embed: {
+                    description: `**Informations sur l'histoire [${nameOfStory.replace(
                       ascii,
                       String.fromCharCode(
-                        getValues(asc, i.match(/\d+/).toString())
+                        getValues(asc, pesto.match(/\d+/).toString())
                       )
-                    );
-                  }
-                  loguer(pesto);
-                  message.repondre({
-                    embed: {
-                      description: `**Informations sur l'histoire [${nameOfStory.replace(
-                        ascii,
-                        String.fromCharCode(
-                          getValues(asc, pesto.match(/\d+/).toString())
-                        )
-                      )}](${lienOrdi})**\n\n`,
-                      thumbnail: { url: coverURL },
-                      author: {
-                        name: `@${authorName[1]}`,
-                        icon_url: authorName[2],
-                        url: 'https://www.wattpad.com/user/' + authorName[1],
-                      },
-                      fields: [
-                        {
-                          name: "Auteur(e) de l'histoire",
-                          value: `${authorName[3]} (@${authorName[1]})`,
-                        },
-                        {
-                          name: 'Lectures',
-                          value: `${viewCount}${
-                            viewCount !== viewCountPlus
-                              ? ` (${viewCountPlus})`
-                              : ''
-                          }`,
-                        },
-                        {
-                          name: 'Votes',
-                          value: `${voteCount}${
-                            voteCount !== voteCountPlus
-                              ? ` (${voteCountPlus})`
-                              : ''
-                          }`,
-                        },
-                        {
-                          name: 'Chapitres',
-                          value: chapterCount,
-                        },
-                      ],
-                      footer: {
-                        text: `Histoire par ${authorName[1]}`,
-                      },
-                      color: 16748341,
+                    )}](${lienOrdi})**\n\n`,
+                    thumbnail: { url: coverURL },
+                    author: {
+                      name: `@${authorName[1]}`,
+                      icon_url: authorName[2],
+                      url: 'https://www.wattpad.com/user/' + authorName[1],
                     },
-                  });
-                } else {
-                  let authorName = res.data.match(
-                    /<a href="\/user\/((?:.(?! ))+)" class="(?:.(?!>))+">\s?<img src="(https:\/\/a\.wattpad\.com\/useravatar\/(?:.(?!\d+\.\d+))+\.\d+\.\d+\.jpg)" width="\d+" height="\d+" alt="((?:.(?! \/))+)" \/>\s?<\/a>/
-                  );
-                  let reginfo = /<span data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Reads))+)\s?Reads">\s?((?:[\dKk,\. ](?!Reads))+)\s?Reads<\/span>\s?<span\s?data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Votes))+)\s?Votes">\s?((?:[\dKk,\. ](?!Votes))+)\s?Votes<\/span>\s?<span>([\d]+)\s?Part\s?Story<\/span>\s?<\/div>\s?<div\s?class="promotion-description-story-details">\s<\/div>/i;
-                  let infosStory = await res.data.match(reginfo);
-                  loguer(reginfo.test(res.data));
-                  let coverURL = await alles[1];
-                  let viewCount = await infosStory[2];
-                  let voteCount = await infosStory[4];
-                  let chapterCount = await infosStory[5];
-                  let viewCountPlus = await infosStory[1];
-                  let voteCountPlus = await infosStory[3];
-                  message.repondre({
-                    embed: {
-                      description: `**Informations sur l'histoire [${nameOfStory}](${lienOrdi})**\n\n`,
-                      thumbnail: { url: coverURL },
-                      author: {
-                        name: `@${authorName[1]}`,
-                        icon_url: authorName[2],
-                        url: 'https://www.wattpad.com/user/' + authorName[1],
+                    fields: [
+                      {
+                        name: "Auteur(e) de l'histoire",
+                        value: `${authorName[3]} (@${authorName[1]})`,
                       },
-                      fields: [
-                        {
-                          name: "Auteur(e) de l'histoire",
-                          value: `${authorName[3]} (@${authorName[1]})`,
-                        },
-                        {
-                          name: 'Lectures',
-                          value: `${viewCount}${
-                            viewCount !== viewCountPlus
-                              ? ` (${viewCountPlus})`
-                              : ''
-                          }`,
-                        },
-                        {
-                          name: 'Votes',
-                          value: `${voteCount}${
-                            voteCount !== voteCountPlus
-                              ? ` (${voteCountPlus})`
-                              : ''
-                          }`,
-                        },
-                        {
-                          name: 'Chapitres',
-                          value: chapterCount,
-                        },
-                      ],
-                      footer: {
-                        text: `Histoire par ${authorName[1]}`,
+                      {
+                        name: 'Lectures',
+                        value: `${viewCount}${
+                          viewCount !== viewCountPlus
+                            ? ` (${viewCountPlus})`
+                            : ''
+                        }`,
                       },
-                      color: 16748341,
+                      {
+                        name: 'Votes',
+                        value: `${voteCount}${
+                          voteCount !== voteCountPlus
+                            ? ` (${voteCountPlus})`
+                            : ''
+                        }`,
+                      },
+                      {
+                        name: 'Chapitres',
+                        value: chapterCount,
+                      },
+                    ],
+                    footer: {
+                      text: `Histoire par ${authorName[1]}`,
                     },
-                  });
-                }
-              });
+                    color: 16748341,
+                  },
+                });
+              } else {
+                let authorName = res.match(
+                  /<a href="\/user\/((?:.(?! ))+)" class="(?:.(?!>))+">\s?<img src="(https:\/\/a\.wattpad\.com\/useravatar\/(?:.(?!\d+\.\d+))+\.\d+\.\d+\.jpg)" width="\d+" height="\d+" alt="((?:.(?! \/))+)" \/>\s?<\/a>/
+                );
+                let reginfo = /<span data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Reads))+)\s?Reads">\s?((?:[\dKk,\. ](?!Reads))+)\s?Reads<\/span>\s?<span\s?data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Votes))+)\s?Votes">\s?((?:[\dKk,\. ](?!Votes))+)\s?Votes<\/span>\s?<span>([\d]+)\s?Part\s?Story<\/span>\s?<\/div>\s?<div\s?class="promotion-description-story-details">\s<\/div>/i;
+                let infosStory = await res.match(reginfo);
+                loguer(reginfo.test(res));
+                let coverURL = await alles[1];
+                let viewCount = await infosStory[2];
+                let voteCount = await infosStory[4];
+                let chapterCount = await infosStory[5];
+                let viewCountPlus = await infosStory[1];
+                let voteCountPlus = await infosStory[3];
+                message.repondre({
+                  embed: {
+                    description: `**Informations sur l'histoire [${nameOfStory}](${lienOrdi})**\n\n`,
+                    thumbnail: { url: coverURL },
+                    author: {
+                      name: `@${authorName[1]}`,
+                      icon_url: authorName[2],
+                      url: 'https://www.wattpad.com/user/' + authorName[1],
+                    },
+                    fields: [
+                      {
+                        name: "Auteur(e) de l'histoire",
+                        value: `${authorName[3]} (@${authorName[1]})`,
+                      },
+                      {
+                        name: 'Lectures',
+                        value: `${viewCount}${
+                          viewCount !== viewCountPlus
+                            ? ` (${viewCountPlus})`
+                            : ''
+                        }`,
+                      },
+                      {
+                        name: 'Votes',
+                        value: `${voteCount}${
+                          voteCount !== voteCountPlus
+                            ? ` (${voteCountPlus})`
+                            : ''
+                        }`,
+                      },
+                      {
+                        name: 'Chapitres',
+                        value: chapterCount,
+                      },
+                    ],
+                    footer: {
+                      text: `Histoire par ${authorName[1]}`,
+                    },
+                    color: 16748341,
+                  },
+                });
+              }
+            });
           });
-        } else if (regUser.test(result.data)) {
-          let urlwatt = await result.data.match(regUser)[3];
-          await axios.default.get(urlwatt).then(async (res) => {
-            let username = await res.data.match(
+        } else if (regUser.test(result)) {
+          let urlwatt = await result.match(regUser)[3];
+          HTTPSRequest(urlwatt).then(async (res) => {
+            let username = await res.match(
               /https:\/\/www.wattpad.com\/user\/((?:.(?! \/>))+)/
             )[1];
-            let followersCount = await res.data.match(
-              /(?<="numFollowers":)\d+K?/
-            );
-            let followingCount = await res.data.match(
-              /(?<="numFollowing":)\d+K?/
-            );
-            let gender = await res.data
+            let followersCount = await res.match(/(?<="numFollowers":)\d+K?/);
+            let followingCount = await res.match(/(?<="numFollowing":)\d+K?/);
+            let gender = await res
               .match(/(?<="gender":")(?:\w+)/)
               .toString()
               .replace(/she/i, 'Femme')
@@ -513,19 +530,19 @@ module.exports = class {
               .replace(/he/i, 'Homme')
               .replace(/they/i, 'Eux')
               .replace(/unknown/i, 'Inconnu');
-            let storyCount = await res.data.match(
+            let storyCount = await res.match(
               /data\-id\="profile\-works"\>\n\<p\>(\d+)\<\/p\>\n\<p\>Works\<\/p\>\n\<\/div\>/
             )[1];
-            let userAvatarURL = await res.data.match(
+            let userAvatarURL = await res.match(
               /(?<="avatar":")(?:.(?!,"is))+/
             );
-            let pseudo = await res.data
+            let pseudo = await res
               .match(/(?<=<title>)(?:.(?!\/title))+/)
               .toString()
               .match(/(?:.(?! Wattpad))+/)
               .toString();
             let regcreatedat = /(?<="createDate":")(\d+)\-(\d+)\-(\d+)T(\d+):(\d+):(\d+)Z/;
-            let resultCreatedAt = await res.data.match(regcreatedat);
+            let resultCreatedAt = await res.match(regcreatedat);
             let createdat = {
               year: resultCreatedAt[1].toString(),
               month: resultCreatedAt[2].toString(),
@@ -655,21 +672,22 @@ module.exports = class {
       storyURL &&
       storyURL.length !== 0 &&
       storyURL !== null &&
-      bot.wattyVisu
+      bot.wattyVisu &&
+      !message.channel.name.includes('annonce')
     ) {
-      axios.default.get(storyURL.toString()).then(async (res) => {
-        let alles = await res.data.match(
+      HTTPSRequest(storyURL.toString()).then(async (res) => {
+        let alles = await res.match(
           /<img src="(https:\/\/a\.wattpad\.com\/cover\/[\d\w]+\-[\d\w]+\-[\d\w]+\.jpg)" height="\d+" width="\d+" alt="(?:.(?!><))+">\s?<\/div>\s?<h1>\s?((?:.(?!\/h1>))+)\s?<\/h1>/
         );
         let nameOfStory = alles[2];
         let ascii = /&#x\d+;/g;
         if (ascii.test(nameOfStory)) {
-          let authorName = res.data.match(
+          let authorName = res.match(
             /<a href="\/user\/((?:.(?! ))+)" class="(?:.(?!>))+">\s?<img src="(https:\/\/a\.wattpad\.com\/useravatar\/(?:.(?!\d+\.\d+))+\.\d+\.\d+\.jpg)" width="\d+" height="\d+" alt="((?:.(?! \/))+)" \/>\s?<\/a>/
           );
           let reginfo = /<span data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Reads))+)\s?Reads">\s?((?:[\dKk,\. ](?!Reads))+)\s?Reads<\/span>\s?<span\s?data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Votes))+)\s?Votes">\s?((?:[\dKk,\. ](?!Votes))+)\s?Votes<\/span>\s?<span>([\d]+)\s?Part\s?Story<\/span>\s?<\/div>\s?<div\s?class="promotion-description-story-details">\s<\/div>/i;
-          let infosStory = await res.data.match(reginfo);
-          loguer(reginfo.test(res.data));
+          let infosStory = await res.match(reginfo);
+          loguer(reginfo.test(res));
           let coverURL = await alles[1];
           let viewCount = await infosStory[2];
           let viewCountPlus = await infosStory[1];
@@ -722,12 +740,12 @@ module.exports = class {
             },
           });
         } else {
-          let authorName = res.data.match(
+          let authorName = res.match(
             /<a href="\/user\/((?:.(?! ))+)" class="(?:.(?!>))+">\s?<img src="(https:\/\/a\.wattpad\.com\/useravatar\/(?:.(?!\d+\.\d+))+\.\d+\.\d+\.jpg)" width="\d+" height="\d+" alt="((?:.(?! \/))+)" \/>\s?<\/a>/
           );
           let reginfo = /<span data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Reads))+)\s?Reads">\s?((?:[\dKk,\. ](?!Reads))+)\s?Reads<\/span>\s?<span\s?data-toggle="tooltip"\s?data-placement="bottom"\s?title="((?:[\dKk,\. ](?!Votes))+)\s?Votes">\s?((?:[\dKk,\. ](?!Votes))+)\s?Votes<\/span>\s?<span>([\d]+)\s?Part\s?Story<\/span>\s?<\/div>\s?<div\s?class="promotion-description-story-details">\s<\/div>/i;
-          let infosStory = await res.data.match(reginfo);
-          loguer(reginfo.test(res.data));
+          let infosStory = await res.match(reginfo);
+          loguer(reginfo.test(res));
           let coverURL = await alles[1];
           let viewCount = await infosStory[2];
           let voteCount = await infosStory[4];
@@ -789,20 +807,28 @@ module.exports = class {
 
     // Changer le statut du bot. Envoyer `${prefix}status idle|dnd|online|invisible`
     if (message.content.startsWith(`${prefix}status`)) {
-      if (!bot.config.admins.includes(message.author.id)) return;
+      if (
+        !bot.config.admins.includes(message.author.id) &&
+        !message.author.id === ownerID
+      )
+        return;
       message.delete();
       await bot.user.setStatus(args[0].toLowerCase());
     }
 
     // Prévisualisation des liens Wattpad vers un profil.
     let urlwatt = /https:\/\/www.wattpad.com\/user\/((?:[^ ])+)/;
-    if (urlwatt.test(message.content) && bot.wattyVisu) {
+    if (
+      urlwatt.test(message.content) &&
+      bot.wattyVisu &&
+      !message.channel.name.includes('annonce')
+    ) {
       let lien = message.content.match(urlwatt)[0];
-      axios.default.get(lien).then(async (res) => {
+      HTTPSRequest(lien).then(async (res) => {
         let username = message.content.match(urlwatt)[1];
-        let followersCount = await res.data.match(/(?<="numFollowers":)\d+K?/);
-        let followingCount = await res.data.match(/(?<="numFollowing":)\d+K?/);
-        let gender = await res.data
+        let followersCount = await res.match(/(?<="numFollowers":)\d+K?/);
+        let followingCount = await res.match(/(?<="numFollowing":)\d+K?/);
+        let gender = await res
           .match(/(?<="gender":")(?:\w+)/)
           .toString()
           .replace(/she/i, 'Femme')
@@ -811,19 +837,17 @@ module.exports = class {
           .replace(/he/i, 'Homme')
           .replace(/they/i, 'Eux')
           .replace(/unknown/i, 'Inconnu');
-        let storyCount = await res.data.match(
+        let storyCount = await res.match(
           /data\-id\="profile\-works"\>\n\<p\>(\d+)\<\/p\>\n\<p\>Works\<\/p\>\n\<\/div\>/
         )[1];
-        let userAvatarURL = await res.data.match(
-          /(?<="avatar":")(?:.(?!,"is))+/
-        );
-        let pseudo = await res.data
+        let userAvatarURL = await res.match(/(?<="avatar":")(?:.(?!,"is))+/);
+        let pseudo = await res
           .match(/(?<=<title>)(?:.(?!\/title))+/)
           .toString()
           .match(/(?:.(?! Wattpad))+/)
           .toString();
         let regcreatedat = /(?<="createDate":")(\d+)\-(\d+)\-(\d+)T(\d+):(\d+):(\d+)Z/;
-        let resultCreatedAt = await res.data.match(regcreatedat);
+        let resultCreatedAt = await res.match(regcreatedat);
         let createdat = {
           year: resultCreatedAt[1].toString(),
           month: resultCreatedAt[2].toString(),
@@ -944,6 +968,7 @@ module.exports = class {
         }
       });
     }
+
     if (message.content.toLowerCase().startsWith(prefix + 'viewcode')) {
       const msg = await message.channel.messages.fetch(args[0]);
       if (!msg.embeds || !msg.embeds[0])
@@ -955,6 +980,68 @@ module.exports = class {
           });
       let embed = JSON.stringify(msg.embeds[0].toJSON(), null, '\t');
       return message.channel.send('```json\n' + embed + '\n```');
+    }
+
+    // Obtenir le code source d'une page Web
+    if (message.content.toLowerCase().startsWith(prefix + 'getsource')) {
+      const URL = args.join('_'),
+        ISHTTPS = /https/.test(URL);
+
+      if (ISHTTPS) {
+        HTTPSRequest(URL)
+          .then((res) => {
+            if (typeof res !== 'string') throw res;
+
+            const ISJSON = res.startsWith('{');
+            if (ISJSON) {
+              if (res.length >= 1000) {
+                return message.channel.send({
+                  files: [
+                    { attachment: Buffer.from(res), name: 'source.json' },
+                  ],
+                });
+              } else return message.channel.send('```json\n' + res + '\n```');
+            } else {
+              if (res.length >= 1000) {
+                return message.channel.send({
+                  files: [
+                    { attachment: Buffer.from(res), name: 'source.html' },
+                  ],
+                });
+              } else return message.channel.send('```html\n' + res + '\n```');
+            }
+          })
+          .catch((err) =>
+            message.channel.send('```cs\n' + err.toString() + '\n```')
+          );
+      } else if (/http/.test(URL)) {
+        await HTTPRequest(URL)
+          .then((res) => {
+            if (typeof res !== 'string') throw res;
+
+            const ISJSON = res.startsWith('{');
+            if (ISJSON) {
+              if (res.length >= 1000) {
+                return message.channel.send({
+                  files: [
+                    { attachment: Buffer.from(res), name: 'source.json' },
+                  ],
+                });
+              } else return message.channel.send('```json\n' + res + '\n```');
+            } else {
+              if (res.length >= 1000) {
+                return message.channel.send({
+                  files: [
+                    { attachment: Buffer.from(res), name: 'source.html' },
+                  ],
+                });
+              } else return message.channel.send('```html\n' + res + '\n```');
+            }
+          })
+          .catch((err) =>
+            message.channel.send('```cs\n' + err.toString() + '\n```')
+          );
+      }
     }
   }
 };

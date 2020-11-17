@@ -21,19 +21,20 @@ class WikiBot extends Client {
     super(options);
 
     this.config = require('./config');
-
+    this.visus = require('./settings.json');
     this.logger = require('./Logger');
+
     this.commands = new Collection();
     this.aliases = new Collection();
     this.settings = new Collection();
     this.owner = this.users.cache.get('428582719044452352');
     this.admins = this.config.admins;
-    this.discordVisu = true;
-    this.wattyVisu = true;
-    this.YTVisu = true;
-    this.wikiVisu = true;
-    this.visus = [this.discordVisu, this.wattyVisu, this.YTVisu, this.wikiVisu];
+    this.discordVisu = this.visus.discordVisu;
+    this.wattyVisu = this.visus.wattyVisu;
+    this.YTVisu = this.visus.wikiVisu;
+    this.wikiVisu = this.visus.ytVisu;
     this.wiki = wiki;
+    this.blogsPublished = new Map();
     this.wait = promisify(setTimeout);
   }
 

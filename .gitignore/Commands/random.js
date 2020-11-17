@@ -1,5 +1,5 @@
 const Command = require('../Base/Command.js'),
-  { Message, MessageEmbed } = require('discord.js'),
+  { Message } = require('discord.js'),
   wiki = require('../Wiki/gdcp.js');
 
 /**
@@ -27,7 +27,7 @@ class Random extends Command {
     const repl = await wiki.random();
     if (repl === undefined || repl === null)
       return message.repondre(
-        'Une erreur est survenue, veuillez réessayer. Si cela ne fonctionne toujours pas, veuillez contacter mon créateur.'
+        '<a:check_cross:767021936185442366> Une erreur est survenue, veuillez réessayer. Si cela ne fonctionne toujours pas, veuillez contacter mon créateur.'
       );
     return msg.edit('', repl);
   }

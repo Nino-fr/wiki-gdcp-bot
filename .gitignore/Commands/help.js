@@ -7,7 +7,7 @@ class Help extends Command {
     super({
       name: 'aide',
       description: 'Donne la liste des commandes que vous pouvez utiliser',
-      category: 'Système',
+      category: 'Bot',
       usage: 'aide [commande]',
       aliases: ['h', 'halp', 'help', 'commands'],
     });
@@ -38,9 +38,9 @@ class Help extends Command {
       embed.setThumbnail(
         'https://static.wikia.nocookie.net/gardiens-des-cites-perdue/images/e/e2/Bienvenue.png/revision/latest/scale-to-width-down/560?cb=20180317150931&path-prefix=fr'
       );
-      const categories = ['Wiki', 'Système'];
+      const categories = ['Wiki', 'Bot'];
       embed.setDescription(
-        `**Utilisez ${this.bot.config.settings.prefix}help <commande> pour plus de détails**\n`
+        `**Utilisez ${this.bot.config.settings.prefix}aide <commande> pour plus de détails**\n`
       );
       categories.forEach((cat) => {
         embed.addField(
@@ -54,15 +54,12 @@ class Help extends Command {
       });
       return message.repondre(embed);
     } else {
-      embed.setFooter(
-        "Les arguments entre <> sont obligatoires et ceux entre [] sont facultatifs. N'oubliez pas d'enlever les <> et les [] pour exécuter la commande, ils sont utilisés ici pour préciser l'importance des arguments."
-      );
       let command = args[0].toLowerCase();
       if (this.bot.commands.has(command)) {
         command = this.bot.commands.get(command);
 
         embed
-          .addField('Nom de la commande', command.help.name, true)
+          .addField('Nom de la commande', `\`${command.help.name}\``, true)
           .addField('Description', command.help.description, true)
           .addField(
             'Utilisation',
@@ -70,7 +67,7 @@ class Help extends Command {
           )
           .addField(
             'Autres noms de la commande de la commande',
-            command.conf.aliases.join(', '),
+            command.conf.aliases.map((alias) => `\`${alias}\``).join(', '),
             true
           )
           .addField(
@@ -78,17 +75,16 @@ class Help extends Command {
               level < this.bot.levelCache[command.conf.permLevel] &&
               command.conf.enabled
             )
-              ? "<:check:754360051480789072> Vous avez la permission d'utiliser cette commande"
-              : ":x: Vous n'avez pas la permission d'utiliser cette commande",
+              ? "<a:checksimplegif:767019089499389962> Vous avez la permission d'utiliser cette commande"
+              : "<a:check_cross:767021936185442366> Vous n'avez pas la permission d'utiliser cette commande",
             '\u200b'
           );
       } else if (this.bot.aliases.has(command)) {
         command = this.bot.aliases.get(command);
         command = this.bot.commands.get(command);
-        /* if (level < this.bot.levelCache[command.conf.permLevel])
-                return; */
+        // if (level < this.bot.levelCache[command.conf.permLevel]) return;
         embed
-          .addField('Nom de la commande', command.help.name, true)
+          .addField('Nom de la commande', `\`${command.help.name}\``, true)
           .addField('Description', command.help.description, true)
           .addField(
             'Utilisation',
@@ -96,13 +92,13 @@ class Help extends Command {
           )
           .addField(
             'Autres noms de la commande de la commande',
-            command.conf.aliases.join(', '),
+            command.conf.aliases.map((alias) => `\`${alias}\``).join(', '),
             true
           )
           .addField(
             !(level < this.bot.levelCache[command.conf.permLevel])
-              ? "<:check:754360051480789072> Vous avez la permission d'utiliser cette commande"
-              : ":x: Vous n'avez pas la permission d'utiliser cette commande",
+              ? "<a:checksimplegif:767019089499389962> Vous avez la permission d'utiliser cette commande"
+              : "<a:check_cross:767021936185442366> Vous n'avez pas la permission d'utiliser cette commande",
             '\u200b'
           );
       }

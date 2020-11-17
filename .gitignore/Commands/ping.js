@@ -8,6 +8,7 @@ class Ping extends Command {
       description: "Latence du bot et temps de réponse de l'api Discord.",
       usage: 'ping',
       aliases: ['pong'],
+      category: 'Bot',
     });
   }
 

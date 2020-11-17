@@ -1,4 +1,5 @@
 'use strict';
+
 /**
  * Convertir un nombre en millisecondes en jours, heures, minutes et secondes
  * @param { Number } ms Le nombre en millisecondes à convertir
@@ -19,6 +20,7 @@ function convertMS(ms) {
     s: s,
   };
 }
+
 /**
  * @param { object } obj L'object
  * @param { String } key La clé de la valeur
@@ -44,6 +46,7 @@ function getObjects(obj, key, val) {
   }
   return objects;
 }
+
 /**
  * Returns an array of values that match on a certain key
  * @param { object } obj L'objet
@@ -61,6 +64,7 @@ function getValues(obj, key) {
   }
   return objects;
 }
+
 /**
  * Returns an array of keys that match on a certain value
  * @param { object } obj
@@ -78,9 +82,104 @@ function getKeys(obj, val) {
   }
   return objects;
 }
+
+/**
+ * Make a request to an URL using https
+ * @param {string} url The URL to fetch in URI format
+ * @returns {Promise<string>}
+ */
+async function MAKEHttpsRequest(url) {
+  const http = require('https');
+  let retour;
+  try {
+    if (/http(?!s)/.test(url))
+      throw new TypeError(
+        'Erreur : la requête est au format HTTP et non HTTPS, veuillez réessayer correctement.'
+      );
+
+    await new Promise(async (resolve) => {
+      await http
+        .get(url, (req) => {
+          let data = '';
+          if (req.statusCode !== 200)
+            throw new Error(
+              'Request failed with status code ' + req.statusCode
+            );
+
+          req.on('data', async (chunk) => {
+            await (data += chunk);
+          });
+
+          req.on('end', async () => {
+            await console.log('Request ended');
+            retour = data;
+          });
+        })
+        .on('error', (err) => {
+          throw new Error(
+            'Error while requesting ' + URL + ' : ' + err.message
+          );
+        });
+
+      setTimeout(resolve, 6000);
+    });
+  } catch (err) {
+    return err;
+  }
+
+  return retour;
+}
+
+/**
+ * Make a request to an URL using https
+ * @param {string} url The URL to fetch in URI format
+ * @returns {Promise<string>}
+ */
+async function MAKEHttpRequest(url) {
+  const http = require('http');
+  let retour;
+
+  try {
+    if (/https/.test(url))
+      throw new TypeError(
+        'La requête est au format HTTPS et non HTTP, veuillez réessayer correctement.'
+      );
+
+    await new Promise(async (resolve) => {
+      await http
+        .get(url, (req) => {
+          let data = '';
+          if (req.statusCode !== 200)
+            throw new Error(
+              'Request failed with status code ' + req.statusCode
+            );
+
+          req.on('data', async (chunk) => {
+            await (data += chunk);
+          });
+
+          req.on('end', async () => {
+            await console.log('Request ended');
+            retour = data;
+          });
+        })
+        .on('error', (err) => {
+          throw new Error('Error while requesting: ' + err.message);
+        });
+
+      setTimeout(resolve, 6000);
+    });
+  } catch (err) {
+    return err;
+  }
+  return retour;
+}
+
 module.exports = {
   getValues: getValues,
   getKeys: getKeys,
   getObjects: getObjects,
   convertMS: convertMS,
+  HTTPRequest: MAKEHttpRequest,
+  HTTPSRequest: MAKEHttpsRequest,
 };

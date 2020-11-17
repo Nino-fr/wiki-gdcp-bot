@@ -23,19 +23,36 @@ class Categorie extends Command {
    * @param {string[]} args
    */
   async run(message, args) {
+    if (!args[0])
+      return message.repondre(
+        "Veuillez spécifier une catégorie dont je dois vous donner les tendances. Pour plus d'informations sur l'utilisation de cette commande, consultez sa page d'aide en exécutant la commande `" +
+          this.bot.config.settings.prefix +
+          'aide tendances`'
+      );
+
     let cat = args.join(' ').toLowerCase();
-    if (cat.trim().match(/p+e+r+s+o+n+a+g+e*s*/)) cat = 'personnages';
-    if (cat.trim().match(/l+i+e+u+x*/)) cat = 'lieux';
-    if (cat.trim().match(/t+h+[ée]+o+r+i+e*s*/)) cat = 'théories';
-    if (cat.trim().match(/t+a+l+[ea]+n+t*/)) cat = 'talent';
-    if (cat.trim().match(/t+o+m+e*s*/)) cat = 'tomes';
-    if (cat.trim().match(/c+o+m+p+a+g*n+i*o+n+s*/)) cat = 'compagnon';
-    if (cat.trim().match(/f+a+n+\s*a+r+t*s*/)) cat = 'fanart';
-    const embed = new MessageEmbed()
-      .setDescription(
-        `**Pages en tendances dans la catégorie [${cat.correctCase()}](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Catégorie:${cat})**`
-      )
-      .setColor('RANDOM');
+    if (
+      cat.trim().match(/p+e+r+s+o+n+a+g+e*s*/) &&
+      !/[ -_m]/.test(cat.trim())
+    ) {
+      cat = 'personnages';
+    } else if (cat.trim().match(/l+i+e+u+x*/) && !/ /.test(cat.trim())) {
+      cat = 'lieux';
+    } else if (
+      cat.trim().match(/t+h+[ée]+o+r+i+e*s*/) &&
+      !/tome/.test(cat.trim())
+    ) {
+      cat = 'théories';
+    } else if (cat.trim().match(/t+a+l+[ea]+n+t*/) && !/ /.test(cat.trim())) {
+      cat = 'talent';
+    } else if (cat.trim().match(/t+o+m+e*s*/) && !/ /.test(cat.trim())) {
+      cat = 'tomes';
+    } else if (cat.trim().match(/c+o+m+p+a+g*n+i*o+n+s*/)) {
+      cat = 'compagnon';
+    } else if (cat.trim().match(/f+a+n+\s*a+r+t*s*/) && !/ /.test(cat.trim())) {
+      cat = 'fanart';
+    } else cat = cat.replace(/ +/g, '_');
+
     switch (cat) {
       case 'personnages':
         embed.setThumbnail(
@@ -77,6 +94,22 @@ class Categorie extends Command {
         );
         break;
     }
+    cat = await cat.replace(/ +/g, '_');
+    cat
+      .match(/(?<=_)./g)
+      .forEach(
+        (matched) => (cat = cat.replace(matched, String(matched).toUpperCase()))
+      );
+    cat = cat.replace(cat.charAt(0), cat.charAt(0).toUpperCase());
+    const embed = new MessageEmbed()
+      .setDescription(
+        `**Pages en tendances dans la catégorie [${cat.replace(
+          /_/g,
+          ' '
+        )}](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Catégorie:${cat})**`
+      )
+      .setColor('RANDOM');
+
     await axios.default
       .get(
         encodeURI(
@@ -86,19 +119,24 @@ class Categorie extends Command {
       .then(async (res) => {
         const arr = await res.data.match(regex);
         if (!arr || arr.length === 0 || arr === (undefined || null))
-          return message.channel.send(
+          throw new Error('Aucune catégorie trouvée');
+        /* return message.channel.send(
             "Aucune catégorie portant ce nom n'a été trouvée"
-          );
+          ); */
+
         await arr.forEach(async (elem) => {
           let matched;
           typeof elem === 'string'
             ? (matched = elem.match(scndreg))
             : (matched = elem.toString().match(scndreg));
           if (!matched || matched === (undefined || null))
-            return message.repondre('Aucune catégorie trouvée pour ce nom');
+            // return message.repondre('Aucune catégorie trouvée pour ce nom');
+            throw new Error('Aucune catégorie trouvée');
+
           matched.shift();
           let link =
-            'https://gardiens-des-cites-perdues.fandom.com' + matched[0];
+            'https://gardiens-des-cites-perdues.fandom.com' +
+            matched[0].replace(/ /g, '%20');
           let title = matched[2];
           embed.fields.push({
             name: title,
@@ -110,8 +148,9 @@ class Categorie extends Command {
         return message.channel.send(embed);
       })
       .catch((err) => {
+        console.log(err.message);
         message.repondre(
-          "Une erreur est survenue durant l'exécution de la commande. Veuillez vérifier votre orthographe ou que la catégorie existe bien. Il se peut également que la catégorie n'ait pas de page en tendance."
+          "<a:check_cross:767021936185442366> Une erreur est survenue durant l'exécution de la commande. Veuillez vérifier votre orthographe ou que la catégorie existe bien. Il se peut également que la catégorie n'ait **pas de page en tendance**."
         );
       });
   }

@@ -9,7 +9,7 @@ class Eval extends Command {
     super({
       name: 'eval',
       description: 'Evalue un code JavaScript.',
-      category: 'Système',
+      category: 'Bot',
       usage: 'eval <code>',
       aliases: ['ev', 'evaluer'],
       permLevel: 'Administrateur',
@@ -24,7 +24,7 @@ class Eval extends Command {
   async run(message, args) {
     const alf = this.bot.alf;
     if (!args[0])
-      return message.repondre('Veuillez préciser un code à evaluer');
+      return message.repondre('Veuillez préciser un code à évaluer');
     let code = args.join(' ').replace(' bot', ' this.bot');
     try {
       code = code.replace(/```/g, '').replace(/js/, '');

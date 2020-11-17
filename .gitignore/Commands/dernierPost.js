@@ -28,17 +28,18 @@ class LastPost extends Command {
    * @param {Message} message
    */
   async run(message) {
-    const bot = this.bot;
-    const msg = await message.channel.send(
-      '<a:discord_loading:756866921370222634> Chargement...'
-    );
-    await bot.channels.cache.get('755540919263953036').send('lol');
+    const bot = this.bot,
+      msg = await message.channel.send(
+        '<a:discord_loading:756866921370222634> Chargement...'
+      ),
+      post = await wiki.checkPosts();
 
-    const post = await wiki.checkPosts();
     if (post !== undefined && post !== null) {
       return msg.edit('', post);
     } else {
-      return msg.edit('Aucun post récent trouvé');
+      return msg.edit(
+        '<a:check_cross:767021936185442366> Une erreur est survenue, veuillez réessayer.'
+      );
     }
   }
 }
