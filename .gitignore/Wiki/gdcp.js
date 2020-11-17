@@ -48,10 +48,22 @@ setInterval(async function () {
       }
     }
 
-    /* const lastInstaPost = await wiki.checkInstaPost();
-  if (lastInstaPost !== undefined && lastInstaPost !== null) {
-    bot.channels.cache.get('759737105559060491').send(lastInstaPost);
-  } */
+    const lastInstaPost = await wiki.checkInstaPost();
+    let instaDejaLa = false;
+    async function checkinsta() {
+      (
+        await bot.channels.cache
+          .get('759676597761998848')
+          .messages.fetch({ limit: 25, query: lastInstaPost.id })
+      ).forEach((msg) => {
+        if (msg.content.includes(lastInstaPost.id)) instaDejaLa = true;
+      });
+    }
+    await checkinsta();
+    if (!instaDejaLa) {
+      bot.channels.cache.get('759676597761998848').send(lastInstaPost.id);
+      bot.channels.cache.get('759737105559060491').send(lastInstaPost);
+    }
   } catch {}
 }, 60000);
 

@@ -846,28 +846,11 @@ class Wiki {
    */
   async checkInstaPost() {
     const bot = require('../setup');
-    /*const fetch = require('node-fetch');
-    let lastSMPost;
-    await fetch('https://www.instagram.com/sw_messenger/?__a=1')
-      .then((res) => res.json())
-      .then(async (instaPosts) => {
-        lastSMPost =
-          instaPosts.graphql.user.edge_owner_to_timeline_media.edges[0].node;
-      });*/
+
     const Insta = require('instagram-posts');
     let lastSMPost = await Insta('sw_messenger');
     lastSMPost = lastSMPost[0];
-    if (
-      parseInt(
-        await (
-          await bot.channels.cache
-            .get('759676597761998848')
-            .messages.fetch({ limit: 1 })
-        )
-          .first()
-          .content.trim()
-      ) !== parseInt(lastSMPost.id)
-    ) {
+    try {
       const lEmbed = new MessageEmbed()
         .setColor('RANDOM')
         .setAuthor(
@@ -883,10 +866,13 @@ class Wiki {
         .setFooter(
           lastSMPost.likes + ' likes • ' + lastSMPost.comments + ' commentaires'
         )
-        .setTimestamp(new Date(lastSMPost.time));
-      bot.channels.cache.get('759676597761998848').send(lastSMPost.id);
+        .setTimestamp();
+      lEmbed.id = lastSMPost.id;
+
       return lEmbed;
-    } else return undefined;
+    } catch {
+      return undefined;
+    }
   }
 
   /**
