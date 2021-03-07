@@ -34,7 +34,6 @@ class Infos extends Command {
           'Naviguer',
           '[Personnages](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Personnages)\n[Familles](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Famille)\n[Pouvoirs](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Pouvoirs?action=edit&redlink=1)\n[Lieux](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Lieux)\n[Conseillers](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Conseiller)\n[Compagnons](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Compagnon)\n[Théories](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Th%C3%A9ories)\n[Aide](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Aide)'
         )
-        .addField('Pages populaires', await this.bot.wiki.getPopularPages())
         .addField(
           'Modifications totales actuelles',
           await this.bot.wiki.getTotalChanges(),
@@ -56,10 +55,15 @@ class Infos extends Command {
           'Nombre de catégories',
           (await this.bot.wiki.getCategories()).total,
           true
+        )
+        .addField(
+          '\u200b',
+          '***Pour une exploration plus complète du Wiki, veuillez utiliser la commande `;explorer`***'
         );
 
       return msg.edit('', embed);
-    } catch {
+    } catch (err) {
+      console.log(err);
       return msg.edit(
         ':warning: Erreur durant le chargement des informations, veuillez réessayer.'
       );

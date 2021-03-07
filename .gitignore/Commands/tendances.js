@@ -31,6 +31,7 @@ class Categorie extends Command {
       );
 
     let cat = args.join(' ').toLowerCase();
+    const embed = new MessageEmbed();
     if (
       cat.trim().match(/p+e+r+s+o+n+a+g+e*s*/) &&
       !/[ -_m]/.test(cat.trim())
@@ -95,13 +96,16 @@ class Categorie extends Command {
         break;
     }
     cat = await cat.replace(/ +/g, '_');
-    cat
-      .match(/(?<=_)./g)
-      .forEach(
-        (matched) => (cat = cat.replace(matched, String(matched).toUpperCase()))
-      );
+    try {
+      cat
+        .match(/(?<=_)./g)
+        .forEach(
+          (matched) =>
+            (cat = cat.replace(matched, String(matched).toUpperCase()))
+        );
+    } catch {}
     cat = cat.replace(cat.charAt(0), cat.charAt(0).toUpperCase());
-    const embed = new MessageEmbed()
+    embed
       .setDescription(
         `**Pages en tendances dans la catégorie [${cat.replace(
           /_/g,

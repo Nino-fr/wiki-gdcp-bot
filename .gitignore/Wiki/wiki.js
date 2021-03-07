@@ -125,6 +125,9 @@ class Wiki {
           .replace(/u+t+i+l+i+[sz]+a+t+e+u*r+s*/i, 'users')
           // .replace(/c+o+m+[ea]+n+t+a+i+r+e*s*/i, 'commentaires')
           .replace(/c+o+m+s*(?:[ea]+n+t+a+i+r+e*s*)?/i, 'commentaires')
+          .replace(/discution/i, 'discussion')
+          .replace(/discussions/i, 'discussion')
+          .replace(/posts?/i, 'discussion')
           .replace(/d+i+s+c+u+[st]*b+l+o+g+s*/i, 'discusblog')
           .replace(/c+o+m+m*e*n*t*a*i*r*e*s*b+l+o+g+s*/i, 'discusblog')
           .replace(/b+l+o+g+[sue]*/i, 'blog')
@@ -395,6 +398,40 @@ class Wiki {
                 }
               }
             });
+        } else if (filter === 'discussion') {
+          await axios.default
+            .get(
+              encodeURI(
+                `https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Spécial:Recherche?scope=internal&query=${toSearch}&contentType=posts`
+              )
+            )
+            .then(async (res) => {
+              let body = res.data;
+              const regDis = /<article>\s*<h1>\s*<a\s*href="([^"]+)"\s*class="unified-search__result__title"\s*data-wiki-id="\d+"\s*data-title="([^"]+)/gi,
+                secRegDis = /<article>\s*<h1>\s*<a\s*href="([^"]+)"\s*class="unified-search__result__title"\s*data-wiki-id="\d+"\s*data-title="([^"]+)/i;
+              let titles = [],
+                links = [];
+              body.match(regDis).forEach((matched) => {
+                let matche = String(matched).match(secRegDis);
+                titles.push(matche[2]);
+                links.push(matche[1]);
+              });
+
+              if (titles.length === 0) {
+                boolResult = false;
+              } else {
+                embed.setDescription(
+                  `${
+                    titles.length < 500 ? titles.length : 'Plus de 500'
+                  } résultats trouvés`
+                );
+                embed.title = `Résultats de la recherche pour \`${toSearch.trim()}\` dans les posts du DE`;
+                for (let i = 0; i < titles.length; i++) {
+                  if (i === 16) break;
+                  embed.addField(titles[i], `[Lien vers le post](${links[i]})`);
+                }
+              }
+            });
         } else {
           return 'Aucune catégorie de recherche trouvée';
         }
@@ -479,49 +516,52 @@ class Wiki {
    * // MessageEmbed
    */
   async getCategories() {
+    /**
+     * @type {string}
+     */
     const code = (
       await axios.default.get(
-        'https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Cat%C3%A9gories'
+        'https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Sp%C3%A9cial:Cat%C3%A9gories?offset=&limit=250'
       )
     ).data;
 
-    const $ = cheerio.load(code);
+    let aExploiter = code
+      .match(/(?<=<ul><li>)(?:.(?!\/ul))+/is)
+      .toString()
+      .replace(/<\/?ul>/g, '');
+    let names = aExploiter
+      .match(/(?<=">)\w+(?=<\/a>)/g)
+      .join('dddd')
+      .split(/dddd/g);
+    if (names[0].length > 50) names = names.slice(1);
 
-    let categories = $('a[class="category-page__member-link"]');
-    let links = [];
-    let names = [];
-    categories
-      .toArray()
-      .forEach((cat) =>
-        names.push(cat.attribs.title.replace('Catégorie:', ''))
-      );
-    categories
-      .toArray()
-      .forEach((cat) =>
-        links.push(`https://${this.nameURL}.fandom.com` + cat.attribs.href)
-      );
+    let links = aExploiter
+      .match(/(?<=href=")[^"]+(?=")/g)
+      .join('dddd')
+      .split('dddd')
+      .map((l) => 'https://' + this.nameURL + '.fandom.com' + l);
 
-    let total = $('p[class="category-page__total-number"]')
-      .text()
-      .replace('pages', 'catégories');
+    if (links[0].length > 50) links = links.slice(1);
+
+    let total = names.length;
 
     const embed = new MessageEmbed()
       .setColor('RANDOM')
       .setTitle('Liste des catégories de tout le wiki')
       .setURL(
-        'https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Cat%C3%A9gories'
+        'https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Sp%C3%A9cial:Cat%C3%A9gories'
       )
       .setDescription(
-        `Nombre de catégories : ${/\d+/.exec(
-          total
-        )}\n\n[Voir toutes les catégories](https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Cat%C3%A9gorie:Cat%C3%A9gories)`
+        `Nombre de catégories : ${total}\n\n[Voir toutes les catégories](${encodeURI(
+          'https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Spécial:Catégories'
+        )})`
       );
 
     // embed.addField('\u200b', '\u200b');
-    for (let i = 0; i <= 10; i++) {
+    for (let i = 0; i <= 15; i++) {
       embed.addField(names[i], `[**Voir la catégorie**](${links[i]})`);
     }
-    return { embed: embed, total: parseInt(total.match(/\d+/)[0]) };
+    return { embed: embed, total: total };
   }
 
   /**
@@ -539,41 +579,61 @@ class Wiki {
       )
       .then((res) => {
         const results = res.data;
-        retour = parseInt(results.query.statistics.edits);
+        let arr = [],
+          num = results.query.statistics.edits;
+        let str = String(num);
+        for (let st of str) {
+          arr.push(st);
+        }
+        let newStr = '';
+        for (let i = 0; i < arr.length; i++) {
+          newStr += arr[i];
+          if (arr.length === 9) {
+            if (i === 2) newStr += ' ';
+            if (i === 5) newStr += ' ';
+          } else if (arr.length === 8) {
+            if (i === 1) newStr += ' ';
+            if (i === 4) newStr += ' ';
+          } else if (arr.length <= 6 && arr.length >= 4) {
+            if (i === 2) newStr += ' ';
+          }
+        }
+
+        retour = newStr.trim();
       });
     return retour;
   }
 
-  /**
-   * Liste des noms et liens des pages populaires du wiki
-   * @returns {Promise<string>}
-   * @example
-   * Wiki.getPopularPages().then(res => console.log(res))
-   * // Pages populaires
-   */
-  async getPopularPages() {
-    let result;
-    const regPop = /(?<=<div class="description-background"><\/div>\s*<div class="description">\s*<h2>)[^<]+(?=\<\/h2>\s*<p class="mw-empty-elt"><\/p>\s*<p class="read-more-button-wrapper">)/g;
-    await axios.default
-      .get(
-        'https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Wiki_Gardiens_des_Cit%C3%A9s_Perdues'
-      )
-      .then((res) => {
-        let populars = res.data.match(regPop);
-        result = populars
-          .map(
-            (pop) =>
-              `[${pop.replace(/ :(?=[A-Za-z])/, ' : ')}](${encodeURI(
-                `https://${this.nameURL}.fandom.com/fr/wiki/${pop.replace(
-                  / :(?=[A-Za-z])/,
-                  ' : '
-                )}`
-              )})`
-          )
-          .join(' 🔹 ');
-      });
-    return result;
-  }
+  // /**
+  //  * Liste des noms et liens des pages populaires du wiki
+  //  * @returns {Promise<string>}
+  //  * @example
+  //  * Wiki.getPopularPages().then(res => console.log(res))
+  //  * // Pages populaires
+  //  */
+  // async getPopularPages() {
+  //   let result;
+  //   const regPop = /(?<=<div class="description-background"><\/div>\s*<div class="description">\s*<h2>)[^<]+(?=\<\/h2>\s*<p class="mw-empty-elt"><\/p>\s*<p class="read-more-button-wrapper">)/g;
+  //   await axios.default
+  //     .get(
+  //       'https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Wiki_Gardiens_des_Cit%C3%A9s_Perdues'
+  //     )
+  //     .then((res) => {
+  //       let populars = res.data.match(regPop);
+  //       result = populars
+  //         .map(
+  //           (pop) =>
+  //             `[${pop.replace(/ :(?=[A-Za-z])/, ' : ')}](${encodeURI(
+  //               `https://${this.nameURL}.fandom.com/fr/wiki/${pop.replace(
+  //                 / :(?=[A-Za-z])/,
+  //                 ' : '
+  //               )}`
+  //             )})`
+  //         )
+  //         .join(' 🔹 ');
+  //     });
+  //   return result;
+  // }
 
   /**
    * @returns {Promise<number>}
@@ -586,7 +646,27 @@ class Wiki {
       )
       .then((res) => {
         const results = res.data;
-        retour = parseInt(results.query.statistics.pages);
+        let arr = [],
+          num = results.query.statistics.pages;
+        let str = String(num);
+        for (let st of str) {
+          arr.push(st);
+        }
+        let newStr = '';
+        for (let i = 0; i < arr.length; i++) {
+          newStr += arr[i];
+          if (arr.length === 9) {
+            if (i === 2) newStr += ' ';
+            if (i === 5) newStr += ' ';
+          } else if (arr.length === 8) {
+            if (i === 1) newStr += ' ';
+            if (i === 4) newStr += ' ';
+          } else if (arr.length <= 6 && arr.length >= 4) {
+            if (i === 2) newStr += ' ';
+          }
+        }
+
+        retour = newStr.trim();
       });
     return retour;
   }
@@ -602,9 +682,28 @@ class Wiki {
       )
       .then((res) => {
         const results = res.data;
+        let arr = [],
+          num = results.query.statistics.users;
+        let str = String(num);
+        for (let st of str) {
+          arr.push(st);
+        }
+        let newStr = '';
+        for (let i = 0; i < arr.length; i++) {
+          newStr += arr[i];
+          if (arr.length === 9) {
+            if (i === 2) newStr += ' ';
+            if (i === 5) newStr += ' ';
+          } else if (arr.length === 8) {
+            if (i === 1) newStr += ' ';
+            if (i === 4) newStr += ' ';
+          } else if (arr.length <= 6 && arr.length >= 4) {
+            if (i === 2) newStr += ' ';
+          }
+        }
+
         users =
-          results.query.statistics.users +
-          ` (${results.query.statistics.activeusers} actifs)`;
+          newStr.trim() + ` (${results.query.statistics.activeusers} actifs)`;
       });
     return users;
   }
@@ -710,6 +809,7 @@ class Wiki {
           .load(infosSelected[0])('img[class="post__image"]')
           .toArray()[0].attribs.src;
       } catch {}
+
       let content;
       try {
         infosSelected[10]
@@ -740,8 +840,12 @@ class Wiki {
         upVotes = infosSelected[12],
         comments = infosSelected[13],
         link = `https://${this.nameURL}.fandom.com` + infosSelected[8];
-      if (infosSelected[10].includes('post-poll'))
+      if (infosSelected[10].includes('post-poll')) {
+        postsEmbed.setThumbnail(
+          'https://images-ext-2.discordapp.net/external/cntRg-ABgCtADuw0nRUBUpPkfT8YVjaPLsD2VU71SbE/https/gardiens-des-cites-perdues.fandom.com/feeds-and-posts/public/12c5a3ac1/assets/server/poll-opengraph.png'
+        );
         content = `[[Sondage](${link})]`;
+      }
       content = content.replace(/(?:undefined|null)/g, '').correctString();
 
       postsEmbed
@@ -783,11 +887,9 @@ class Wiki {
         'https://gardiens-des-cites-perdues.fandom.com/fr/wiki/Sp%C3%A9cial:Random'
       )
       .then(async (res) => {
-        const title =
-          (await res.data.match(/<title>([^<]+)<\/title>/)[1]) ||
-          (await res.data
-            .match(/<title>[^<]+<\/title>/)
-            .match(/(?<=>)[^<]+(?=<)/));
+        const title = res.data.match(
+          /<meta property="og:title" content="([^"]+)"\/>/
+        )[1];
         if (!title) return undefined;
 
         const link =
@@ -796,18 +898,17 @@ class Wiki {
           )[1]) ||
           (await res.data.match(/<link rel="canonical" href="[^"]+"\/>/));
         if (!link) return undefined;
-        let description =
-          (await res.data.match(
-            /<meta name="description" content="([^"]+)"/
-          )[1]) ||
-          (await res.data
-            .match(/<meta name="description" content="[^"]+"/)
-            .match(/(?<=content=")[^"]+(?=")/));
-        if (!description) return undefined;
-        description = description.replace(
-          /<a href="([^"]+)">((?:.(?!\/a>))+)/g,
-          `[$2](${`https://${this.nameURL}.fandom.com$1`})`
+        let description = await res.data.match(
+          /<p>(?:(?:<a[^>]*>)|(?:<b[^>]*>)|(?:<i[^>]*>)|(?:<u[^>]*>))*(?:(?:[^<])|(?:<\/?[ubia]>)|(?:<a [^>]*>)){3,}/
         );
+        if (!description) return undefined;
+        description = String(description)
+          .replace(
+            /<a href="([^"]+)">((?:.(?!\/a>))+)/g,
+            `[$2](${`https://${this.nameURL}.fandom.com$1`})`
+          )
+          .slice(0, description.indexOf('. '));
+        description = description.correctString();
         let imgURL;
         try {
           await axios.default.get(encodeURI(link)).then(async (body) => {
@@ -841,39 +942,70 @@ class Wiki {
     return embed;
   }
 
-  /**
-   * Check si SM a fait un nouveau post Instagram
-   */
-  async checkInstaPost() {
-    const bot = require('../setup');
+  // /**
+  //  * Check si SM a fait un nouveau post Instagram
+  //  */
+  // async checkInstaPost() {
+  //   const Insta = require('instagram-posts');
+  //   let lastSMPost = await Insta('sw_messenger');
+  //   lastSMPost = lastSMPost[0];
+  //   try {
+  //     const lEmbed = new MessageEmbed()
+  //       .setColor('RANDOM')
+  //       .setAuthor(
+  //         lastSMPost.username,
+  //         'https://i0.wp.com/novelnovice.com/wp-content/uploads/sites/210/2016/04/Shannon-Messenger-YA.jpg',
+  //         'https://www.instagram.com/' + lastSMPost.username
+  //       )
+  //       .setDescription(
+  //         lastSMPost.text +
+  //           `\n\n[Voir la publication en entier](https://www.instagram.com/p/${lastSMPost.shortcode})`
+  //       )
+  //       .setImage(lastSMPost.display_url)
+  //       .setFooter(
+  //         lastSMPost.likes + ' likes • ' + lastSMPost.comments + ' commentaires'
+  //       )
+  //       .setTimestamp();
+  //     lEmbed.id = lastSMPost.id;
 
-    const Insta = require('instagram-posts');
-    let lastSMPost = await Insta('sw_messenger');
-    lastSMPost = lastSMPost[0];
-    try {
-      const lEmbed = new MessageEmbed()
-        .setColor('RANDOM')
-        .setAuthor(
-          lastSMPost.username,
-          'https://instagram.fbru2-1.fna.fbcdn.net/v/t51.2885-19/s150x150/12825990_998970970191892_1739790847_a.jpg?_nc_ht=instagram.fbru2-1.fna.fbcdn.net&_nc_ohc=NFlMbN8BhwAAX-WjfHI&oh=72fc9ec5ebbf4ad71e6e25994c78e4f7&oe=5F9EDC94',
-          'https://www.instagram.com/' + lastSMPost.username
-        )
-        .setDescription(
-          lastSMPost.text +
-            `\n\n[Voir la publication en entier](https://www.instagram.com/p/${lastSMPost.shortcode})`
-        )
-        .setImage(lastSMPost.display_url)
-        .setFooter(
-          lastSMPost.likes + ' likes • ' + lastSMPost.comments + ' commentaires'
-        )
-        .setTimestamp();
-      lEmbed.id = lastSMPost.id;
+  //     return lEmbed;
+  //   } catch {
+  //     return undefined;
+  //   }
+  //   /*
+  //   let sm = await axios.default.get(
+  //     'https://www.instagram.com/sw_messenger/?__a=1'
+  //   );
+  //   sm = JSON.parse(sm.data);
+  //   let lastSMPost = sm.graphql.user.edge_owner_to_timeline_media.edges[0].node;
+  //   try {
+  //     const lEmbed = new MessageEmbed()
+  //       .setColor('RANDOM')
+  //       .setAuthor(
+  //         lastSMPost.owner.username,
+  //         'https://pbs.twimg.com/profile_images/2854007123/5697810c2469f90473751c1b4ddd8aa6_400x400.jpeg',
+  //         'https://www.instagram.com/' + lastSMPost.owner.username
+  //       )
+  //       .setDescription(
+  //         lastSMPost.edge_media_to_caption.edges[0].node.text +
+  //           `\n\n[Voir la publication en entier](https://www.instagram.com/p/${lastSMPost.shortcode})`
+  //       )
+  //       .setImage(lastSMPost.display_url)
+  //       .setFooter(
+  //         lastSMPost.edge_liked_by.count +
+  //           ' likes • ' +
+  //           lastSMPost.edge_media_to_comment.count +
+  //           ' commentaires'
+  //       )
+  //       .setTimestamp();
+  //     lEmbed.id = lastSMPost.id;
 
-      return lEmbed;
-    } catch {
-      return undefined;
-    }
-  }
+  //     return lEmbed;
+  //   } catch {
+  //     return undefined;
+  //   }
+  //    */
+  // }
 
   /**
    * @param {string} name Le nom du wiki fandom
@@ -884,7 +1016,7 @@ class Wiki {
     this.nameURL = nameURL;
     this.getCategories().then((res) => (this.categories = res));
     this.getTotalChanges().then((res) => (this.totalChanges = res));
-    this.getPopularPages().then((res) => (this.popularPages = res));
+    // this.getPopularPages().then((res) => (this.popularPages = res));
     this.getTotalPages().then((pages) => (this.totalPages = pages));
     this.getUsers().then((users) => (this.users = users));
     this.getArticlesCount().then((articles) => (this.articles = articles));

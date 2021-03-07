@@ -9,7 +9,7 @@ class Search extends Command {
     super({
       name: 'recherche',
       description:
-        'Rechercher dans les articles du wiki (vous pouvez ajouter des filtres différents à la recherche pour rechercher plus précisément : `+utilisateurs` pour rechercher dans les utilisateurs, `+commentaires` pour rechercher dans les commentaires, `+blog` pour rechercher dans les blogs des utilisateurs, `+discusBlog` pour rechercher dans les commentaires des blogs, `+fichiers` pour rechercher dans les fichiers, `+mur` pour rechercher dans les murs, `+catégorie` pour rechercher dans les catégories ou encore `+tout` pour rechercher dans tout le wiki)',
+        'Rechercher dans les articles du wiki (vous pouvez ajouter des filtres différents à la recherche pour rechercher plus précisément : `+utilisateurs` pour rechercher dans les utilisateurs, `+commentaires` pour rechercher dans les commentaires, `+blog` pour rechercher dans les blogs des utilisateurs, `+discusBlog` pour rechercher dans les commentaires des blogs, `+fichiers` pour rechercher dans les fichiers, `+mur` pour rechercher dans les murs, `+catégorie` pour rechercher dans les catégories, `+posts` pour rechercher dans les posts du  DE ou encore `+tout` pour rechercher dans tout le wiki)',
       usage: "recherche <ce qu'il faut rechercher> [+filtre]",
       aliases: [
         'rechercher',

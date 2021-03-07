@@ -7,13 +7,16 @@ module.exports = class {
    * @param {Message} message
    */
   async run(message) {
+    if (message.channel.type === 'dm')
+      return bot.channels.cache
+        .get('800758460001550367')
+        .send(
+          `<@428582719044452352> **Message de ${message.author.tag} (${message.author.id}) :**\n${message.content}`
+        );
     if (message.author.bot) return;
 
     // Cancel any attempt to execute commands if the bot cannot respond to the user.
-    if (
-      message.guild &&
-      !message.channel.permissionsFor(message.guild.me).missing('SEND_MESSAGES')
-    )
+    if (message.guild && !message.guild.me.permissions.missing('SEND_MESSAGES'))
       return;
 
     const set = bot.settings.get('settings') || {};

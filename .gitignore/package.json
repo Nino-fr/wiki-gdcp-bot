@@ -1,6 +1,6 @@
 {
   "name": "wiki-bot-gdcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Un bot pour le serveur Discord du Wiki Gardiens des Cités Perdues",
   "main": "setup.js",
   "scripts": {
@@ -32,13 +32,13 @@
   },
   "homepage": "https://github.com/Nino-fr/wiki-gdcp-bot#readme",
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.1",
     "chalk": "^4.1.0",
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.4.1",
-    "instagram-posts": "^2.2.0",
     "klaw": "^3.0.0",
     "moment": "^2.29.0",
+    "multiples": "^1.0.3",
     "updated-youtube-info": "^1.4.7"
   }
 }

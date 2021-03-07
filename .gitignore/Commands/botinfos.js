@@ -1,5 +1,6 @@
 const Command = require('../Base/Command.js'),
-  { version, Message, MessageEmbed } = require('discord.js'),
+  { Message, MessageEmbed } = require('discord.js'),
+  { version } = process,
   { convertMS } = require('../fonctions');
 
 class Stats extends Command {

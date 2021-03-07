@@ -34,11 +34,13 @@ class newsInsta extends Command {
       '<a:discord_loading:756866921370222634> Chargement...'
     );
 
-    const post = await wiki.checkInstaPost();
-    if (post !== undefined && post !== null) {
-      return msg.edit('', post);
-    } else {
-      return msg.edit('Aucun post récent trouvé');
+    try {
+      const post = await wiki.checkInstaPost();
+      if (post !== undefined && post !== null) {
+        return msg.edit('', post);
+      } else throw 'Erreur';
+    } catch {
+      msg.edit('Une erreur est survenue, veuillez réessayer');
     }
   }
 }
