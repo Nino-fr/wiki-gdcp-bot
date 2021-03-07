@@ -285,7 +285,7 @@ console.log(result);
 
 const alf = new Client({ partials: ['MESSAGE', 'REACTION', 'USER'] });
 
-alf.login('NzU3MjEyMzM1ODI2OTI3Njg3.X2dG8Q.CTwEGgzl_5EXpu3LzFjntL-XF2g');
+alf.login('secretToken');
 
 alf.on('message', async (message) => {
   if (message.author.id !== '428582719044452352') return;
