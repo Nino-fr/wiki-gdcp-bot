@@ -1,5 +1,5 @@
 /**
- * @type {{
+ * @typedef {{
   ownerID: '428582719044452352',
   version: string,
 
@@ -17,35 +17,33 @@
   },
 
   permLevels: object[],
-}}
+}} confType
  */
-let confType;
 
 /**
  * @type {confType}
  */
 const config = {
   ownerID: '428582719044452352',
-  version: '1.1.5',
+  version: '1.3.1',
 
   admins: [
     '689489970116952130',
     '441202025355542538',
-    '443800928902971402',
+    '535545825057832980',
     '684112671695699989',
     '745935191582703626',
     '718456289704804392',
+    '798494866728288277',
   ],
   mod: [],
 
-  token: 'NzQ5OTg3MTEzNTExOTQ0Mzc0.X0z97Q.jjP_XxBehH4JLulyIsWfia_lAv8',
+  token: 'secretToken',
 
   settings: {
     prefix: require('./settings.json').prefix,
     modLogChannel: 'logs',
     systemNotice: 'true',
-    welcomeEnabled: 'false',
-    welcomeMessage: 'Bienvenue dans ce serveur {{user}} !',
   },
 
   permLevels: [
