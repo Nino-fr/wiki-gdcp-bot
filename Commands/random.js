@@ -1,0 +1,36 @@
+const Command = require('../Base/Command.js'),
+  { Message } = require('discord.js'),
+  wiki = require('../Wiki/gdcp.js');
+
+/**
+ * Donne le lien vers une page au hasard du wiki
+ */
+class Random extends Command {
+  constructor() {
+    super({
+      name: 'pageAléatoire',
+      description: 'Donne le lien vers une page au hasard du wiki',
+      usage: 'pageAléatoire',
+      aliases: ['pageAleatoire', 'pageAuHasard', 'randomPage', 'random', 'any'],
+    });
+  }
+
+  /**
+   *
+   * @param {Message} message
+   * @param {string[]} args
+   */
+  async run(message) {
+    const msg = await message.channel.send(
+      '<a:discord_loading:756866921370222634> Chargement...'
+    );
+    const repl = await wiki.random();
+    if (repl === undefined || repl === null)
+      return message.repondre(
+        '<a:check_cross:767021936185442366> Une erreur est survenue, veuillez réessayer. Si cela ne fonctionne toujours pas, veuillez contacter mon créateur.'
+      );
+    return msg.edit('', repl);
+  }
+}
+
+module.exports = Random;
