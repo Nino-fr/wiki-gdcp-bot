@@ -3,10 +3,8 @@ const { ownerID } = require('./config.js');
 const bot = require('./setup.js'),
   { Message, MessageEmbed, TextChannel } = require('discord.js'),
   regWiki = /https:\/\/gardiens-des-cites-perdues.fandom.com\/fr\/wiki\/[^\s]+/,
-  axios = require('axios'),
   prefix = bot.config.settings.prefix,
-  { getValues, HTTPSRequest, HTTPRequest } = require('./fonctions'),
-  loguer = bot.logger.log,
+  { getValues } = require('./fonctions'),
   asc = require('./ascii.json');
 
 module.exports = class {
@@ -991,81 +989,6 @@ module.exports = class {
           });
         }
       });
-    }
-
-    if (message.content.toLowerCase().startsWith(prefix + 'viewcode')) {
-      const msg = await message.channel.messages.fetch(args[0]);
-      if (!msg.embeds || !msg.embeds[0])
-        return message.channel
-          .send('Ce message ne contient aucun embed !')
-          .then((m) => {
-            message.delete();
-            m.delete();
-          });
-      let embed = JSON.stringify(msg.embeds[0].toJSON(), null, '\t');
-      return message.channel.send('```json\n' + embed + '\n```');
-    }
-
-    // Obtenir le code source d'une page Web
-    if (message.content.toLowerCase().startsWith(prefix + 'getsource')) {
-      const URL = args.join('_'),
-        ISHTTPS = /https/.test(URL);
-
-      if (ISHTTPS) {
-        HTTPSRequest(URL)
-          .then((res) => {
-            if (typeof res !== 'string') throw res;
-
-            const ISJSON = res.startsWith('{');
-            if (ISJSON) {
-              if (res.length >= 1000) {
-                return message.channel.send({
-                  files: [
-                    { attachment: Buffer.from(res), name: 'source.json' },
-                  ],
-                });
-              } else return message.channel.send('```json\n' + res + '\n```');
-            } else {
-              if (res.length >= 1000) {
-                return message.channel.send({
-                  files: [
-                    { attachment: Buffer.from(res), name: 'source.html' },
-                  ],
-                });
-              } else return message.channel.send('```html\n' + res + '\n```');
-            }
-          })
-          .catch((err) =>
-            message.channel.send('```cs\n' + err.toString() + '\n```')
-          );
-      } else if (/http/.test(URL)) {
-        await HTTPRequest(URL)
-          .then((res) => {
-            if (typeof res !== 'string') throw res;
-
-            const ISJSON = res.startsWith('{');
-            if (ISJSON) {
-              if (res.length >= 1000) {
-                return message.channel.send({
-                  files: [
-                    { attachment: Buffer.from(res), name: 'source.json' },
-                  ],
-                });
-              } else return message.channel.send('```json\n' + res + '\n```');
-            } else {
-              if (res.length >= 1000) {
-                return message.channel.send({
-                  files: [
-                    { attachment: Buffer.from(res), name: 'source.html' },
-                  ],
-                });
-              } else return message.channel.send('```html\n' + res + '\n```');
-            }
-          })
-          .catch((err) =>
-            message.channel.send('```cs\n' + err.toString() + '\n```')
-          );
-      }
     }
   }
 };

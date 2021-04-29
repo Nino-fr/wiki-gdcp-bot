@@ -407,14 +407,14 @@ bot.on('messageReactionAdd', async (reaction, user) => {
   if (
     !reaction.message.embeds[0] &&
     user.id !== bot.user.id &&
-    reaction.message.author.id === bot.user.id
+    reaction.message.author.id === bot.user.id &&
+    reaction.message.content.includes('Chargement...')
   ) {
     return reaction.users.remove(user);
   }
 
+  if (reaction.message.partial) await reaction.message.fetch();
   if (reaction.message.embeds[0]) {
-    if (reaction.message.partial) await reaction.message.fetch();
-
     let rTab = reaction.message.reactions.cache
       .array()
       .map((r) => r.emoji.name);
@@ -886,7 +886,14 @@ bot.on('messageReactionAdd', async (reaction, user) => {
             )
           );
         }
-      } else reaction.remove();
+      } else if (
+        msg.reactions.cache.has('1️⃣') &&
+        msg.reactions.cache.has('⬅️') &&
+        msg.reactions.cache.has('3️⃣') &&
+        msg.reactions.cache.has('2️⃣') &&
+        msg.reactions.cache.has('4️⃣')
+      )
+        reaction.remove();
     }
   }
 });

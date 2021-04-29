@@ -38,7 +38,6 @@
     "discord.js": "^12.4.1",
     "klaw": "^3.0.0",
     "moment": "^2.29.0",
-    "multiples": "^1.0.3",
     "updated-youtube-info": "^1.4.7"
   }
 }

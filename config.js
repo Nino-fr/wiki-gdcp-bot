@@ -25,7 +25,7 @@
  */
 const config = {
   ownerID: '428582719044452352',
-  version: '1.3.1',
+  version: '1.3.8',
 
   admins: [
     '689489970116952130',
