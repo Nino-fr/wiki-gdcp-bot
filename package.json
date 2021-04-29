@@ -1,6 +1,6 @@
 {
   "name": "wiki-bot-gdcp",
-  "version": "1.2.0",
+  "version": "1.3.8",
   "description": "Un bot pour le serveur Discord du Wiki Gardiens des Cités Perdues",
   "main": "setup.js",
   "scripts": {
